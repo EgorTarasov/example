@@ -22,31 +22,26 @@ export default function RegisterPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true);
-        try {
-            rootStore.singup({
-                name,
-                email,
-                password,
-                confirmPassword
-            }).then(() => {
-                navigate({
-                    to: "/login",
-                })
-            }).finally(() => {
-                setIsLoading(false)
-            });
-            if (rootStore.token) {
-                console.log('Registration successful');
-                navigate({
-                    to: "/login",
-                })
-                console.log('Registration attempted with:' + rootStore.token)
-            }
-        }
-        catch (e) {
-            console.log('Registration failed');
-        }
 
+        rootStore.singup({
+            name,
+            email,
+            password,
+            confirmPassword
+        }).then(() => {
+            navigate({
+                to: "/login",
+            })
+        }).finally(() => {
+            setIsLoading(false)
+        });
+        if (rootStore.token) {
+            console.log('Registration successful');
+            navigate({
+                to: "/login",
+            })
+            console.log('Registration attempted with:' + rootStore.token)
+        }
 
     }
 
