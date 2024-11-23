@@ -4,16 +4,50 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Github, Twitter } from 'lucide-react'
+import {Github, Loader2, Twitter} from 'lucide-react'
 import Logo from '@/components/logo'
-import { Link } from '@tanstack/react-router'
+import {Link, useNavigate} from '@tanstack/react-router'
+import {observer} from "mobx-react";
+import {useStores} from "../../../hooks/useStores.tsx";
 
-export default function LoginPage() {
+
+
+
+
+const LoginPage = observer( () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+
+
+    const {rootStore} = useStores();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
+        setIsLoading(true);
+        rootStore.login({
+            email,
+            password
+        }).then(() => {
+            navigate({
+                to: "/dashboard",
+            })
+        }).finally(()=> {
+                setIsLoading(false)
+        });
+        if (rootStore.token) {
+            console.log('Login successful');
+            navigate({
+                to: "/dashboard",
+            })
+        }
+
+        console.log(rootStore.token ? 'Login successful' : 'Login failed');
+
+
+
         console.log('Login attempted with:', { email, password })
     }
 
@@ -59,9 +93,17 @@ export default function LoginPage() {
                                     required
                                 />
                             </div>
-                            <Button type="submit" className="w-full">
+                            { isLoading ? (<Button disabled={!isLoading} type="submit" className="w-full">
+                                <Loader2 className="animate-spin" />
+                                Please wait
+                            </Button> ):
+                                (
+                                <Button type="submit" className="w-full">
                                 Log In
-                            </Button>
+                                </Button>
+                                )
+                            }
+
                         </form>
 
                         <div className="mt-4">
@@ -95,4 +137,6 @@ export default function LoginPage() {
             </div>
         </div>
     )
-}
+})
+
+export default LoginPage
