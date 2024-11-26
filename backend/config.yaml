@@ -1,0 +1,22 @@
+server:
+  port: 9999
+  host: 10.0.1.80
+  cors:
+    - http://localhost:9999
+    - http://localhost:5173
+
+pg:
+  dsn: postgresql://pg-user:pg-password@127.0.0.1:5432/t1-dev
+
+dashboard:
+  telegram_link: https://t.me/dino_misis_bot?start=
+
+auth:
+  jwt_secret: hello_world
+
+click:
+  host: 10.0.1.80
+  port: 9990
+  username: default
+  password:
+  db: default

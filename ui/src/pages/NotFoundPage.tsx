@@ -32,11 +32,12 @@ export default function NotFoundPage() {
                         <p className="text-sm text-gray-600">
                             Need help? {' '}
                             <Link
-                                to='/contact'
+                                to='/'
                                 className="text-blue-600 hover:underline"
                             >
                                 Contact Us
                             </Link>
+
                         </p>
                     </CardFooter>
                 </Card>

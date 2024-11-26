@@ -6,19 +6,43 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Github, Twitter } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
+import {Github, Loader2, Twitter} from 'lucide-react'
+import {Link, useNavigate} from '@tanstack/react-router'
 import Logo from '@/components/logo'
+import {rootStore} from "@/stores/RootStore.ts";
 
 export default function RegisterPage() {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        console.log('Registration attempted with:', { name, email, password, confirmPassword })
+        setIsLoading(true);
+
+        rootStore.singup({
+            name,
+            email,
+            password,
+            confirmPassword
+        }).then(() => {
+            navigate({
+                to: "/login",
+            })
+        }).finally(() => {
+            setIsLoading(false)
+        });
+        if (rootStore.token) {
+            console.log('Registration successful');
+            navigate({
+                to: "/login",
+            })
+            console.log('Registration attempted with:' + rootStore.token)
+        }
+
     }
 
     return (
@@ -85,9 +109,19 @@ export default function RegisterPage() {
                                     required
                                 />
                             </div>
-                            <Button type="submit" className="w-full">
-                                Sign Up
-                            </Button>
+                            { isLoading ?
+                                (
+                                    <Button disabled={!isLoading} type="submit" className="w-full">
+                                        <Loader2 className="animate-spin" />
+                                    Please wait
+                                    </Button>) :
+                                (
+                                    <Button type="submit" className="w-full">
+                                        Sign Up
+                                    </Button>
+                                )
+                            }
+
                         </form>
 
                         <div className="mt-4">

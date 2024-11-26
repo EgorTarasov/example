@@ -1,5 +1,4 @@
 // src/components/Logo.tsx
-import React from 'react';
 
 const Logo = () => {
     return (
