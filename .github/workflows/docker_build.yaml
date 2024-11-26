@@ -42,7 +42,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: ./backend
-        file: Dockerfile.backend
+        file: ./backend/Dockerfile.backend
         platforms: linux/amd64
-        tags: ghcr.io/egortarasov/ds-module/control:${{ steps.extract_branch.outputs.tag }}
+        tags: ghcr.io/egortarasov/example/backend:${{ steps.extract_branch.outputs.tag }}
         push: true

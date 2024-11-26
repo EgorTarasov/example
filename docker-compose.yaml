@@ -3,10 +3,10 @@ volumes:
 
 services:
   backend:
-    image: ghcr.io/egortarasov/example/backend:latest
+    image: ghcr.io/egortarasov/example/backend:backend-4baa74c
     volumes:
       - ./config.yaml:/root/config.yaml
-    command: ./main
+    command: ./main --config /root/config.yaml
     restart: always
     depends_on:
       pg:

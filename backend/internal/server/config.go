@@ -22,7 +22,7 @@ type Config struct {
 
 func NewConfig(configFilePath string, env ...bool) *Config {
 	var cfg Config
-	err := cleanenv.ReadEnv(&cfg)
+	err := cleanenv.ReadConfig(configFilePath, &cfg)
 	if err != nil {
 		panic(err)
 	}

@@ -8,23 +8,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile.backend
     volumes:
-      - ./docker-config.yaml:/root/config.yaml
+      - ./config.yaml:/root/config.yaml
     ports:
       - "9999:9999"
-    command: ./main
+    command:  ./main --config /root/config.yaml
     restart: always
-  migrations:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.migration
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER:-pg-user}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pg-password}
-      - POSTGRES_DB=${POSTGRES_DB:-t1-dev}
-      - POSTGRES_HOST=${POSTGRES_HOST:-pg}
-    depends_on:
-      pg:
-        condition: service_healthy
+
 
   pg:
     image: pgvector/pgvector:pg17
