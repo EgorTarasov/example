@@ -5251,3 +5251,11 @@ snapshots:
   yaml@2.6.1: {}
   yocto-queue@0.1.0: {}
   zod@3.23.8: {}
+
+  zustand@4.5.5(@types/react@18.3.12)(immer@9.0.21)(react@18.3.1):
+    dependencies:
+      use-sync-external-store: 1.2.2(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 18.3.12
+      immer: 9.0.21
+      react: 18.3.1
