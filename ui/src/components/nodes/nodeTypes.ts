@@ -2,9 +2,7 @@
 // nodeTypes.ts
 import { NodeTypes } from "@xyflow/react";
 import InputBlockNodeType from "./InputBlockNode";
-import { DataBlockNode } from "./DataBlockNode";
-
-
+import DataBlockNode from "./DataBlockNode";
 
 
 export const nodeTypes: NodeTypes = {

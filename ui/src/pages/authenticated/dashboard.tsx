@@ -1,5 +1,5 @@
 import { Navbar } from '@/components/navbar'
-import {DocumentCard, DocumentCardAdd} from '@/components/document-card'
+import { DocumentCard, DocumentCardAdd } from '@/components/document-card'
 
 const documentTypes = [
     { name: 'Invoices', count: 145 },
@@ -18,10 +18,8 @@ export default function Dashboard() {
                     {documentTypes.map((doc) => (
                         <DocumentCard key={doc.name} name={doc.name} count={doc.count} />
                     ))}
-                    <DocumentCardAdd/>
+                    <DocumentCardAdd />
                 </div>
-
-
             </main>
         </div>
     )

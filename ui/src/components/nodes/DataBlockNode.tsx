@@ -1,15 +1,14 @@
-import { BaseNode } from "@/components/ui/base-node";
-import { Handle, NodeProps, Position, Node } from "@xyflow/react";
+import React, { memo, useState } from 'react';
+import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { Input } from "@/components/ui/input";
-import { Select, SelectItem } from "@/components/ui/select"
-import { DataBlockDto } from "@/api/models/models";
-import { useState } from 'react';
+import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
+import { DataBlockDto } from '@/api/models/models';
 
 export type DataBlockNodeType = Node<{
     dto: DataBlockDto;
 }, 'dataBlock'>;
 
-export function DataBlockNode({ data }: NodeProps<DataBlockNodeType>) {
+const DataBlockNode = ({ data, isConnectable }: NodeProps<DataBlockNodeType>) => {
     const [type, setType] = useState(data.dto.type);
     const [url, setUrl] = useState(data.dto.url);
 
@@ -20,41 +19,79 @@ export function DataBlockNode({ data }: NodeProps<DataBlockNodeType>) {
         { value: 'confluence', label: 'Confluence' }
     ];
 
+    const handleParse = () => {
+        // Add your parse logic here
+        console.log('Parsing data...');
+    };
+
     return (
-        <BaseNode>
-            <div className="flex flex-col gap-2">
-                <div className="font-bold text-sm border-b pb-2">Data Block</div>
-                <Handle
-                    type="target"
-                    position={Position.Top}
-                    style={{ width: '8px', height: '8px' }}
-                />
-                <div className="text-xs space-y-2">
-                    <div>ID: {data.dto.id}</div>
-                    <Select
-                        value={type}
-                        onValueChange={(value) => setType(value)}
-                    >
-                        {typeOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                            </SelectItem>
-                        ))}
-                    </Select>
-                    <Input
-                        className="nodrag"
-                        type="text"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="Enter URL"
+        <>
+            <Handle
+                type="target"
+                position={Position.Left}
+                onConnect={(params) => console.log('handle onConnect', params)}
+                isConnectable={isConnectable}
+                style={{ width: '8px', height: '8px' }}
+            />
+            <div className="flex flex-row gap-2 w-[500px] h-[300px]">
+                <div className="flex flex-col gap-2 w-1/2">
+                    <div className="font-bold text-sm border-b pb-2">Data Block</div>
+                    <div className="text-xs space-y-2">
+                        <div>ID: {data.dto.id}</div>
+                        <Select
+                            value={type}
+                            onValueChange={(value) => setType(value)}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {typeOptions.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Input
+                            className="nodrag"
+                            type="text"
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
+                            placeholder="Enter URL"
+                        />
+                        <button
+                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                            onClick={handleParse}
+                        >
+                            Parse
+                        </button>
+                    </div>
+                </div>
+                <div className="flex-1 overflow-hidden w-1/2">
+                    <iframe
+                        src={url}
+                        className="w-full h-full border-0"
+                        title="Preview"
                     />
                 </div>
-                <Handle
-                    type="source"
-                    position={Position.Bottom}
-                    style={{ width: '8px', height: '8px' }}
-                />
             </div>
-        </BaseNode>
+            <Handle
+                type="source"
+                position={Position.Right}
+                id="a"
+                isConnectable={isConnectable}
+                style={{ width: '8px', height: '8px' }}
+            />
+            <Handle
+                type="source"
+                position={Position.Right}
+                id="b"
+                isConnectable={isConnectable}
+                style={{ width: '8px', height: '8px' }}
+            />
+        </>
     );
-}
+};
+
+export default memo(DataBlockNode);
