@@ -5,7 +5,7 @@ import {RegisterInfo, RegisterResponce} from "@/api/models/register.ts";
 class AuthApiService {
     public async login(body: LoginInfo){
         const response = await axios.post<LoginResponse>('/api/auth/login', body);
-
+        console.log(response.data);
         return response.data;
     }
 
