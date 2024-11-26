@@ -12,14 +12,14 @@ export function ChatBotWidget() {
     const [messages, setMessages] = useState<{ text: string; isUser: boolean }[]>([])
     const [inputMessage, setInputMessage] = useState('')
     const ws = useRef<WebSocket | null>(null)
-
+    const messagesRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (isOpen) {
             ws.current = new WebSocket('wss://larek.tech/api/chat/ws/1')
 
             ws.current.onmessage = (event) => {
                 const message: Message = JSON.parse(event.data)
-                setMessages(prev => [...prev, {token:"", text: message.text, isUser: false }])
+                setMessages(prev => [...prev, {token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiZG9jdG9yIiwic3ViIjoiMiIsImV4cCI6MTczMjc0NjQyNX0.bhnRobq9hipWB_EMoUgjJL1sUEoRkTd3XPZFCxd54pQ", text: message.text, isUser: false }])
             }
 
             ws.current.onclose = () => {
@@ -32,6 +32,21 @@ export function ChatBotWidget() {
         }
     }, [isOpen])
 
+    const scrollToBottom = () => {
+        messagesRef.current?.scrollIntoView(false)
+    }
+
+    useEffect(() => {
+        scrollToBottom()
+    }, [])
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+    // useEffect(() => {
+    //     if(messagesRef.current){
+    //         messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    //     }
+    // }, [messages]);
     const handleSendMessage = () => {
         if (!inputMessage.trim() || !ws.current) return
 
@@ -54,27 +69,30 @@ export function ChatBotWidget() {
     return (
         <div className="fixed bottom-4 right-4 z-50">
             {isOpen ? (
-                <Card className="w-80 h-96 flex flex-col">
+                <Card className="w-80 max-h-[calc(100vh-2rem)] flex flex-col overflow-y-auto">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <h2 className="text-sm font-bold">Chat Bot</h2>
-                        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                        <Button variant="secondary" size="icon" onClick={() => setIsOpen(false)}>
                             <X className="h-4 w-4" />
                         </Button>
                     </CardHeader>
                     <CardContent>
                         <ScrollArea className="h-72 w-full pr-4">
-                            {messages.map((msg, index) => (
-                                <div
-                                    key={index}
-                                    className={`mb-2 p-2 rounded-lg ${
-                                        msg.isUser
-                                            ? 'bg-primary text-primary-foreground ml-auto'
-                                            : 'bg-muted'
-                                    } max-w-[80%] ${msg.isUser ? 'ml-auto' : 'mr-auto'}`}
-                                >
-                                    {msg.text}
-                                </div>
-                            ))}
+                            <div ref={messagesRef}>
+                                {messages.map((msg, index) => (
+                                    <div
+                                        key={index}
+                                        className={`mb-2 p-2 rounded-lg ${
+                                            msg.isUser
+                                                ? 'bg-primary text-primary-foreground ml-auto'
+                                                : 'bg-muted'
+                                        } max-w-[80%] ${msg.isUser ? 'ml-auto' : 'mr-auto'}`}
+                                    >
+                                        {msg.text}
+                                    </div>
+                                ))}
+                            </div>
+
                         </ScrollArea>
                     </CardContent>
                     <CardFooter>
