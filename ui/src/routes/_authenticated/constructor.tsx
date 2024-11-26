@@ -7,6 +7,6 @@ export const Route = createFileRoute('/_authenticated/constructor')({
 
 function RouteComponent() {
   return(
-      <Constructor/>
+      <Constructor />
 )
 }

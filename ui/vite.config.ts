@@ -21,7 +21,6 @@ export default defineConfig({
       '/': {
         target: 'https://larek.tech',
         changeOrigin: true,
-
       }
     }
   },
