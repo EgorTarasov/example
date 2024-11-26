@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
@@ -28,52 +28,53 @@ const DataBlockNode = ({ data, isConnectable }: NodeProps<DataBlockNodeType>) =>
         <>
             <Handle
                 type="target"
-                position={Position.Left}
-                onConnect={(params) => console.log('handle onConnect', params)}
+                position={Position.Top}
                 isConnectable={isConnectable}
-                style={{ width: '8px', height: '8px' }}
+                style={{ width: '8px', height: '8px', background: '#555' }}
             />
-            <div className="flex flex-row gap-2 w-[500px] h-[300px]">
-                <div className="flex flex-col gap-2 w-1/2">
-                    <div className="font-bold text-sm border-b pb-2">Data Block</div>
-                    <div className="text-xs space-y-2">
-                        <div>ID: {data.dto.id}</div>
-                        <Select
-                            value={type}
-                            onValueChange={(value) => setType(value)}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select Type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {typeOptions.map(option => (
-                                    <SelectItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <Input
-                            className="nodrag"
-                            type="text"
-                            value={url}
-                            onChange={(e) => setUrl(e.target.value)}
-                            placeholder="Enter URL"
-                        />
-                        <button
-                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-                            onClick={handleParse}
-                        >
-                            Parse
-                        </button>
+            <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200">
+                <div className="flex flex-row gap-2 w-[500px] h-[300px]">
+                    <div className="flex flex-col gap-2 w-1/2">
+                        <div className="font-bold text-sm border-b pb-2">Data Block</div>
+                        <div className="text-xs space-y-2">
+                            <div>ID: {data.dto.id}</div>
+                            <Select
+                                value={type}
+                                onValueChange={(value) => setType(value)}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {typeOptions.map(option => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Input
+                                className="nodrag"
+                                type="text"
+                                value={url}
+                                onChange={(e) => setUrl(e.target.value)}
+                                placeholder="Enter URL"
+                            />
+                            <button
+                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                                onClick={handleParse}
+                            >
+                                Parse
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div className="flex-1 overflow-hidden w-1/2">
-                    <iframe
-                        src={url}
-                        className="w-full h-full border-0"
-                        title="Preview"
-                    />
+                    <div className="flex-1 overflow-hidden w-1/2">
+                        <iframe
+                            src={url}
+                            className="w-full h-full border-0"
+                            title="Preview"
+                        />
+                    </div>
                 </div>
             </div>
             <Handle
@@ -81,14 +82,7 @@ const DataBlockNode = ({ data, isConnectable }: NodeProps<DataBlockNodeType>) =>
                 position={Position.Right}
                 id="a"
                 isConnectable={isConnectable}
-                style={{ width: '8px', height: '8px' }}
-            />
-            <Handle
-                type="source"
-                position={Position.Right}
-                id="b"
-                isConnectable={isConnectable}
-                style={{ width: '8px', height: '8px' }}
+                style={{ width: '8px', height: '8px', background: '#555' }}
             />
         </>
     );
