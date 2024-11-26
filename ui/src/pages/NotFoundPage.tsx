@@ -37,6 +37,7 @@ export default function NotFoundPage() {
                             >
                                 Contact Us
                             </Link>
+
                         </p>
                     </CardFooter>
                 </Card>

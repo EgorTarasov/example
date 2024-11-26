@@ -1,0 +1,118 @@
+basePath: /
+definitions:
+  auth.UserRole:
+    enum:
+    - doctor
+    - patient
+    type: string
+    x-enum-varnames:
+    - Doctor
+    - Patient
+  handlers.emailLoginPayload:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  handlers.emailPayload:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.AccessTokenResponse:
+    properties:
+      access_token:
+        type: string
+      type:
+        type: string
+    type: object
+  models.UserData:
+    properties:
+      role:
+        $ref: '#/definitions/auth.UserRole'
+      user_id:
+        type: integer
+    type: object
+host: larek.tech
+info:
+  contact:
+    email: fiber@swagger.io
+    name: API Support
+  description: api for t1 hackaton
+  license:
+    name: BSD 3-Clause License
+    url: https://raw.githubusercontent.com/EgorTarasov/example/main/LICENSE
+  termsOfService: http://swagger.io/terms/
+  title: t1 api
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user with email and password
+      parameters:
+      - description: Email Login Payload
+        in: body
+        name: emailLoginPayload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.emailLoginPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+        "422":
+          description: Unprocessable Entity
+      summary: Login with email
+      tags:
+      - auth
+  /api/auth/me:
+    get:
+      description: Get the information of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserData'
+      summary: Get user information
+      tags:
+      - auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email and password
+      parameters:
+      - description: Email Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.emailPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AccessTokenResponse'
+        "400":
+          description: Bad Request
+        "422":
+          description: Unprocessable Entity
+      summary: Register with email
+      tags:
+      - auth
+swagger: "2.0"
