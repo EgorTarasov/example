@@ -11,6 +11,10 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    target: "esnext",
+    outDir: "../backend/static",
+  },
   server: {
     port: 5173,
     proxy: {
