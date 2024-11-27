@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
-import { LLMDto } from '@/api/models/models';
+import { GenerateResponse, LLMDto } from '@/api/models/models';
 import { isValidConnection } from './utils';
 // import ollama from 'ollama';
 import axios from 'axios';
@@ -19,7 +19,7 @@ const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
     const [template] = useState('');
 
     const [response, setResponse] = useState('');
-    const [loading, setLoading] = useState(false); 
+    // const [loading, setLoading] = useState(false); 
 
     const typeOptions = [
         { value: 'mistral', label: 'mistral 7b' },
@@ -27,68 +27,73 @@ const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
         { value: 'llama3.2', label: 'llama3.2 3b' },
     ];
 //7869
+    
+    //3 try
+    
     // const handleTestConnection = async () => {
-    //     try {
-    //         const message = { role: 'user', content: prompt };
-    //         const responseStream = await ollama.chat({ model: type, messages: [message], stream: true });
-    //         let fullResponse = '';
-    //         for await (const part of responseStream) {
-    //             fullResponse += part.message.content;
-    //         }
-    //         setResponse(fullResponse);
-    //     } catch (error) {
-    //         console.error('Error testing connection:', error);
-    //         setResponse('Error testing connection');
-    //     }
-    // };
-    // const handleTestConnection = async () => {
+    //     setLoading(true);
     //     try {
     //         const payload = {
-    //             model: type,
+    //             model: type, // Use selected model from state
     //             prompt: prompt,
+    //             stream: false,
     //         };
 
     //         const config = {
     //             headers: {
     //                 'Content-Type': 'application/json',
     //             },
+    //             stream: false, 
     //         };
-
+    //         console.log("i've tried(")
+    //         console.log(`endpoint ${endpoint} \n payload \n ${payload.model} \n ${payload.prompt}`)
     //         // Make an HTTP POST request to the Ollama API
-    //         const response = await axios.post(endpoint, payload, config);
+    //         const res = await axios.post<GenerateResponse>(endpoint, payload, {});
 
     //         // Assuming the API returns a JSON response with a 'reply' field
-    //         setResponse(response.data.reply);
+    //         setResponse(res.response);
     //     } catch (error) {
     //         console.error('Error testing connection:', error);
     //         setResponse('Error testing connection');
+    //     } finally {
+    //         setLoading(false);
     //     }
     // };
 
-    //3 try
-    
     const handleTestConnection = async () => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const payload = {
-                model: type, // Use selected model from state
+                model: type,
                 prompt: prompt,
+                stream: false,
             };
-
-            console.log("i've tried(")
-            console.log(`endpoint ${endpoint} \n payload \n ${payload.model} \n ${payload.prompt}`)
-            // Make an HTTP POST request to the Ollama API
-            const res = await axios.post<{ reply: string }>(endpoint, payload, {});
-
-            // Assuming the API returns a JSON response with a 'reply' field
-            setResponse(res.data.reply);
+    
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // stream: false, // Set stream to false
+            };
+    
+            // Make an HTTP POST request to the Ollama API with the GenerateResponse type
+            const res = await axios.post<GenerateResponse>(endpoint, payload, config);
+    
+            // Access the 'response' field from the API response
+            setResponse(res.data.response);
         } catch (error) {
             console.error('Error testing connection:', error);
-            setResponse('Error testing connection');
+            if (axios.isAxiosError(error) && error.response) {
+                setResponse(`Error: ${error.response.data.error || 'Unknown error'}`);
+            } else {
+                setResponse('Error testing connection');
+            }
         } finally {
-            setLoading(false);
+            // setLoading(false);/
+            console.log('done')
         }
     };
+
 
     return (
         <>

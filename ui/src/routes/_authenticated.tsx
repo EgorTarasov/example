@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { rootStore } from '../stores/RootStore.ts'
 import { Navbar } from '@/components/navbar.tsx';
 import ApiService from '@/api/ApiService.ts';
+import { ChatBotWidget } from '@/components/chat-bot-widget.tsx';
 
 
 
@@ -31,6 +32,7 @@ export const Route = createFileRoute('/_authenticated')({
 
 function RouteComponent() {
   return <>
+    <ChatBotWidget/>
     <Navbar />
     <Outlet />
   </>
