@@ -34,20 +34,28 @@ const Dashboard = () => {
 
     return (
         <div>
-            <h1 className="mb-4 text-2xl font-bold">Dashboard</h1>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {pipelines.map((pipeline) => (
-
-                    <div key={pipeline.id} className="p-4 border rounded shadow">
-                        <h2 className="text-lg font-semibold">{pipeline.title}</h2>
-                        <p>{pipeline.description}</p>
-                        <Link key={pipeline.id} to={`/pipeline/${pipeline.id}`}>Редактировать</Link>
+        <h1 className="mb-4 ml-4 text-2xl font-bold">Dashboard</h1>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {pipelines.map((pipeline) => (
+                <div key={pipeline.id} className="p-4 border rounded shadow grid grid-cols-1 gap-2">
+                    <div className='border-b mb-4 pb-2'>
+                        <h2 className="text-lg font-semibold mb-2">{pipeline.title}</h2>
                     </div>
-
-                ))}
-                <DocumentCardAdd />
-            </div>
+                    
+                    <div className="mb-4">
+                        <p>{pipeline.description}</p>
+                    </div>
+                    <Link
+                        to={`/pipeline/${pipeline.id}`}
+                        className="mt-auto px-4 py-2 bg-blue-500 text-white rounded text-center"
+                    >
+                        Редактировать
+                    </Link>
+                </div>
+            ))}
+            <DocumentCardAdd />
         </div>
+    </div>
     );
 };
 

@@ -33,7 +33,7 @@ export const DocumentCardAdd = () => {
 
     const handleCreatePipeline = async () => {
         await rootStore.createPipeline({
-            name: title,
+            title: title,
             description: description,
         });
         if (rootStore.currentPipelineId === undefined || rootStore.currentPipelineId === null) {

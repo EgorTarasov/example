@@ -1,7 +1,7 @@
 // models.ts
 
 export interface CreatePipeLine {
-    name: string;
+    title: string;
     description: string;
 }
 
