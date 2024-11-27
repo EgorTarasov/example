@@ -7,8 +7,10 @@ export const isValidConnection = (connection: Connection | Edge): boolean => {
 
     // Allow connections only from InputBlockNode to DataBlockNode
     // and from LLMNode to InputBlockNode
+
+    // { source: '1732699979453', sourceHandle: 'inputBlock|1732699979453|source', target: '1732699246918', targetHandle: 'llm|1732699246918|target' }
     return (
         (sourceNodeType === 'inputBlock' && targetNodeType === 'dataBlock') ||
-        (sourceNodeType === 'llm' && targetNodeType === 'inputBlock')
+        (sourceNodeType === 'inputBlock' && targetNodeType === 'llm')
     );
 };
