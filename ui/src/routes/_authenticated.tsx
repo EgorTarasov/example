@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { rootStore } from '../stores/RootStore.ts'
 import { Navbar } from '@/components/navbar.tsx';
-import AuthApiService from '@/api/AuthApiService.ts';
+import ApiService from '@/api/ApiService.ts';
 
 
 
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authenticated')({
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          await AuthApiService.me();
+          await ApiService.me();
         } catch (error) {
           localStorage.removeItem('token');
           throw redirect({

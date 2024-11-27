@@ -1,44 +1,65 @@
 import { makeAutoObservable } from "mobx";
-import authApiService from "@/api/AuthApiService.ts";
+import apiService from "@/api/ApiService.ts";
 import { LoginInfo, LoginResponse } from "@/api/models/auth.ts";
 import { RegisterInfo } from "@/api/models/register.ts";
+
+
 
 
 export class RootStore {
 
     token: LoginResponse | null = null;
-
+    currentPipelineId: number | null = null;
 
     constructor() {
         makeAutoObservable(this);
     }
-    saveToken() {
-        if (this.token) {
-            localStorage.setItem('token', JSON.stringify(this.token));
-        }
+    saveToken(token: string) {
+        localStorage.setItem('token', token);
+        apiService.setAuthToken(token);
     }
 
     loadToken() {
         const token = localStorage.getItem('token');
+        console.log('Loaded token: ' + token);
         if (token) {
-            this.token = JSON.parse(token);
+            this.token = {
+                accessToken: token,
+                type: 'Bearer',
+            };
+            apiService.setAuthToken(token);
         }
+
     }
 
     async login(loginInfo: LoginInfo) {
-        this.token = await authApiService.login(loginInfo);
-        this.saveToken();
+        const token = await apiService.login(loginInfo);
+        this.token = token;
+        this.saveToken(token.accessToken);
         console.log(this.token);
     }
 
     async singup(registerInfo: RegisterInfo) {
-        this.token = await authApiService.register(registerInfo);
+        const token = await apiService.register(registerInfo);
+        this.token = token;
         console.log('Registered, token:' + this.token);
-        this.saveToken();
+        this.saveToken(token.accessToken);
     }
 
     async logout() {
         this.token = null
+    }
+
+    async createPipeline() {
+        if (this.token) {
+            console.log('Creating pipeline');
+            const response = await apiService.createPipeLine({
+                name: 'New pipeline',
+                description: 'New pipeline description'
+            });
+            this.currentPipelineId = response.id;
+            console.log('Created pipeline with id ' + response.id);
+        }
     }
 }
 

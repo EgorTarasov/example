@@ -5,6 +5,10 @@ export interface CreatePipeLine {
     description: string;
 }
 
+export interface CreatePipeLineResponse {
+    id: number;
+}
+
 export interface PipeLineDto {
     id: number;
     name: string;

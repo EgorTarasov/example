@@ -3,6 +3,10 @@ import { CirclePlus } from "lucide-react";
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 
+
+import { useNavigate } from '@tanstack/react-router';
+import { useStores } from '@/hooks/useStores';
+
 interface DocumentCardProps {
     name: string
     count: number
@@ -26,7 +30,21 @@ export function DocumentCard({ name, count }: DocumentCardProps) {
 
 
 
-export function DocumentCardAdd() {
+export const DocumentCardAdd = () => {
+    const { rootStore } = useStores();
+    const navigate = useNavigate();
+
+    const handleCreatePipeline = async () => {
+        await rootStore.createPipeline();
+        if (rootStore.currentPipelineId === undefined) {
+            return;
+        }
+        navigate({
+            to: '/pipeline/' + rootStore.currentPipelineId
+        });
+
+    }
+
     return (
         <Card className="p-4 shadow-lg rounded-lg">
             <CardHeader className="flex flex-col items-center justify-center space-y-2 pb-4">
@@ -44,10 +62,13 @@ export function DocumentCardAdd() {
                     placeholder="Описание"
                     className="w-full p-2 border border-gray-300 rounded-md"
                 />
-                <Button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                <Button
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                    onClick={handleCreatePipeline}
+                >
                     Добавить pipeline
                 </Button>
             </CardContent>
-        </Card>
+        </Card >
     );
-}
+};

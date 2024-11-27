@@ -2,7 +2,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import "./index.css"
 
 import { routeTree } from './routeTree.gen'
-import { useAuth } from "../hooks/useAuth.tsx";
+import { useAuth } from "@/hooks/useAuth.tsx";
 import '@xyflow/react/dist/style.css';
 
 

@@ -1,4 +1,6 @@
 import { DocumentCard, DocumentCardAdd } from '@/components/document-card'
+import { useStores } from '@/hooks/useStores';
+import { observer } from 'mobx-react';
 
 const documentTypes = [
     { name: 'Invoices', count: 145 },
@@ -6,8 +8,9 @@ const documentTypes = [
     { name: 'Proposals', count: 89 },
     { name: 'Reports', count: 234 },
 ]
+const Dashboard = observer(() => {
+    const rootStore = useStores();
 
-export default function Dashboard() {
     return (
         <main className="flex-1 p-4 md:p-6">
             <h1 className="mb-4 text-2xl font-bold">Dashboard</h1>
@@ -20,4 +23,6 @@ export default function Dashboard() {
         </main>
 
     )
-}
+});
+
+export default Dashboard;
