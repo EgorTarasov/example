@@ -29,13 +29,14 @@ RETURNING id,
     updated_at;
 
 -- name: CreateLlmBlock :one
-INSERT INTO llm_blocks(input_block_id, llm_type, model, prompt, template, widget_block_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO llm_blocks(input_block_id, llm_type, model, prompt, llm_endpoint, template, widget_block_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id,
     input_block_id,
     llm_type,
     model,
     prompt,
+	llm_endpoint,
     template,
     widget_block_id,
     created_at,
@@ -78,10 +79,10 @@ WHERE user_id = $1;
 
 -- name: GetPipelineById :one
 SElECT * from pipelines
-INNER JOIN input_blocks ON pipelines.id=input_blocks.pipeline_id
-INNER JOIN data_blocks ON input_blocks.id=data_blocks.input_block_id
-INNER JOIN llm_blocks ON input_blocks.id=llm_blocks.input_block_id
-INNER JOIN widget_blocks ON llm_blocks.id=widget_blocks.llm_block_id
-INNER JOIN text_splitters ON data_blocks.id=text_splitters.data_block_id
-INNER JOIN vector_stores ON data_blocks.id=vector_stores.data_block_id
+FULL JOIN input_blocks ON pipelines.id=input_blocks.pipeline_id
+FULL JOIN data_blocks ON input_blocks.id=data_blocks.input_block_id
+FULL JOIN llm_blocks ON input_blocks.id=llm_blocks.input_block_id
+FULL JOIN widget_blocks ON llm_blocks.id=widget_blocks.llm_block_id
+FULL JOIN text_splitters ON data_blocks.id=text_splitters.data_block_id
+FULL JOIN vector_stores ON data_blocks.id=vector_stores.data_block_id
 WHERE user_id = $1;

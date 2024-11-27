@@ -103,13 +103,14 @@ func (q *Queries) CreateInputBlock(ctx context.Context, arg CreateInputBlockPara
 }
 
 const createLlmBlock = `-- name: CreateLlmBlock :one
-INSERT INTO llm_blocks(input_block_id, llm_type, model, prompt, template, widget_block_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO llm_blocks(input_block_id, llm_type, model, prompt, llm_endpoint, template, widget_block_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id,
     input_block_id,
     llm_type,
     model,
     prompt,
+	llm_endpoint,
     template,
     widget_block_id,
     created_at,
@@ -121,26 +122,42 @@ type CreateLlmBlockParams struct {
 	LlmType       string
 	Model         string
 	Prompt        string
+	LlmEndpoint   string
 	Template      string
 	WidgetBlockID int64
 }
 
-func (q *Queries) CreateLlmBlock(ctx context.Context, arg CreateLlmBlockParams) (LlmBlock, error) {
+type CreateLlmBlockRow struct {
+	ID            int32
+	InputBlockID  pgtype.Int8
+	LlmType       string
+	Model         string
+	Prompt        string
+	LlmEndpoint   string
+	Template      string
+	WidgetBlockID int64
+	CreatedAt     pgtype.Timestamp
+	UpdatedAt     pgtype.Timestamp
+}
+
+func (q *Queries) CreateLlmBlock(ctx context.Context, arg CreateLlmBlockParams) (CreateLlmBlockRow, error) {
 	row := q.db.QueryRow(ctx, createLlmBlock,
 		arg.InputBlockID,
 		arg.LlmType,
 		arg.Model,
 		arg.Prompt,
+		arg.LlmEndpoint,
 		arg.Template,
 		arg.WidgetBlockID,
 	)
-	var i LlmBlock
+	var i CreateLlmBlockRow
 	err := row.Scan(
 		&i.ID,
 		&i.InputBlockID,
 		&i.LlmType,
 		&i.Model,
 		&i.Prompt,
+		&i.LlmEndpoint,
 		&i.Template,
 		&i.WidgetBlockID,
 		&i.CreatedAt,
@@ -160,14 +177,14 @@ RETURNING id,
 `
 
 type CreatePipeLineParams struct {
-	UserID              int64
+	UserID              pgtype.Int8
 	Title               string
 	PipelineDescription string
 }
 
 type CreatePipeLineRow struct {
 	ID        int32
-	UserID    int64
+	UserID    pgtype.Int8
 	Title     string
 	CreatedAt pgtype.Timestamp
 	UpdatedAt pgtype.Timestamp
@@ -270,7 +287,7 @@ RETURNING id,
 type CreateWidgetBlockParams struct {
 	LlmBlockID pgtype.Int8
 	ImageUrl   string
-	Styles     string
+	Styles     []byte
 }
 
 func (q *Queries) CreateWidgetBlock(ctx context.Context, arg CreateWidgetBlockParams) (WidgetBlock, error) {
@@ -292,7 +309,7 @@ SELECT id, user_id, title, pipeline_description, created_at, updated_at, deleted
 WHERE user_id = $1
 `
 
-func (q *Queries) GetDashboardById(ctx context.Context, userID int64) ([]Pipeline, error) {
+func (q *Queries) GetDashboardById(ctx context.Context, userID pgtype.Int8) ([]Pipeline, error) {
 	rows, err := q.db.Query(ctx, getDashboardById, userID)
 	if err != nil {
 		return nil, err
@@ -321,7 +338,7 @@ func (q *Queries) GetDashboardById(ctx context.Context, userID int64) ([]Pipelin
 }
 
 const getPipelineById = `-- name: GetPipelineById :one
-SElECT pipelines.id, user_id, title, pipeline_description, pipelines.created_at, pipelines.updated_at, pipelines.deleted_at, input_blocks.id, pipeline_id, input_blocks.data_block_id, llm_id, input_blocks.created_at, input_blocks.updated_at, input_blocks.deleted_at, data_blocks.id, data_blocks.input_block_id, storage_url, storage_type, text_splitter_id, vector_store_id, data_blocks.created_at, data_blocks.updated_at, llm_blocks.id, llm_blocks.input_block_id, llm_type, model, prompt, template, widget_block_id, llm_blocks.created_at, llm_blocks.updated_at, widget_blocks.id, llm_block_id, image_url, styles, widget_blocks.created_at, widget_blocks.updated_at, text_splitters.id, text_splitters.data_block_id, splitter_type, config, text_splitters.created_at, text_splitters.updated_at, vector_stores.id, vector_stores.data_block_id, store_type, collection_name, persist_directory, vector_stores.created_at, vector_stores.updated_at from pipelines
+SElECT pipelines.id, user_id, title, pipeline_description, pipelines.created_at, pipelines.updated_at, pipelines.deleted_at, input_blocks.id, pipeline_id, input_blocks.data_block_id, llm_id, input_blocks.created_at, input_blocks.updated_at, input_blocks.deleted_at, data_blocks.id, data_blocks.input_block_id, storage_url, storage_type, text_splitter_id, vector_store_id, data_blocks.created_at, data_blocks.updated_at, llm_blocks.id, llm_blocks.input_block_id, llm_endpoint, llm_type, model, prompt, template, widget_block_id, llm_blocks.created_at, llm_blocks.updated_at, widget_blocks.id, llm_block_id, image_url, styles, widget_blocks.created_at, widget_blocks.updated_at, text_splitters.id, text_splitters.data_block_id, splitter_type, config, text_splitters.created_at, text_splitters.updated_at, vector_stores.id, vector_stores.data_block_id, store_type, collection_name, persist_directory, vector_stores.created_at, vector_stores.updated_at from pipelines
 INNER JOIN input_blocks ON pipelines.id=input_blocks.pipeline_id
 INNER JOIN data_blocks ON input_blocks.id=data_blocks.input_block_id
 INNER JOIN llm_blocks ON input_blocks.id=llm_blocks.input_block_id
@@ -333,7 +350,7 @@ WHERE user_id = $1
 
 type GetPipelineByIdRow struct {
 	ID                  int32
-	UserID              int64
+	UserID              pgtype.Int8
 	Title               string
 	PipelineDescription string
 	CreatedAt           pgtype.Timestamp
@@ -356,6 +373,7 @@ type GetPipelineByIdRow struct {
 	UpdatedAt_3         pgtype.Timestamp
 	ID_4                int32
 	InputBlockID_2      pgtype.Int8
+	LlmEndpoint         string
 	LlmType             string
 	Model               string
 	Prompt              string
@@ -366,7 +384,7 @@ type GetPipelineByIdRow struct {
 	ID_5                int32
 	LlmBlockID          pgtype.Int8
 	ImageUrl            string
-	Styles              string
+	Styles              []byte
 	CreatedAt_5         pgtype.Timestamp
 	UpdatedAt_5         pgtype.Timestamp
 	ID_6                int32
@@ -384,7 +402,7 @@ type GetPipelineByIdRow struct {
 	UpdatedAt_7         pgtype.Timestamp
 }
 
-func (q *Queries) GetPipelineById(ctx context.Context, userID int64) (GetPipelineByIdRow, error) {
+func (q *Queries) GetPipelineById(ctx context.Context, userID pgtype.Int8) (GetPipelineByIdRow, error) {
 	row := q.db.QueryRow(ctx, getPipelineById, userID)
 	var i GetPipelineByIdRow
 	err := row.Scan(
@@ -412,6 +430,7 @@ func (q *Queries) GetPipelineById(ctx context.Context, userID int64) (GetPipelin
 		&i.UpdatedAt_3,
 		&i.ID_4,
 		&i.InputBlockID_2,
+		&i.LlmEndpoint,
 		&i.LlmType,
 		&i.Model,
 		&i.Prompt,

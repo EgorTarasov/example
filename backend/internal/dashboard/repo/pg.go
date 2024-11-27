@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/EgorTarasov/example/internal/dashboard/models"
 	"github.com/EgorTarasov/example/pkg/db"
@@ -22,15 +23,25 @@ func NewPgRepo(pool *pgxpool.Pool) GraphRepo {
 }
 
 func IntToPgType(value int64) pgtype.Int8 {
-	return pgtype.Int8{
+	v := pgtype.Int8{
 		Int64: value,
 		Valid: true,
 	}
+	return v
+}
+
+func NewNull() pgtype.Int8 {
+	v := pgtype.Int8{
+		Int64: 0,
+		Valid: false,
+	}
+	return v
+
 }
 
 func (pg *pg) CreatePipeline(ctx context.Context, payload models.CreatePipeLine) (int64, error) {
 	newPipeline, err := pg.Queries.CreatePipeLine(ctx, db.CreatePipeLineParams{
-		UserID:              payload.UserID,
+		UserID:              IntToPgType(payload.UserID),
 		Title:               payload.Title,
 		PipelineDescription: payload.Description,
 	})
@@ -41,7 +52,7 @@ func (pg *pg) CreatePipeline(ctx context.Context, payload models.CreatePipeLine)
 }
 
 func (pg *pg) GetDashboardById(ctx context.Context, id int64) ([]models.PipeLineDashboardDto, error) {
-	dashboard, err := pg.Queries.GetDashboardById(ctx, id)
+	dashboard, err := pg.Queries.GetDashboardById(ctx, IntToPgType(id))
 	dashboardPipelines := []models.PipeLineDashboardDto{}
 	if err != nil {
 		return []models.PipeLineDashboardDto{}, err
@@ -57,7 +68,7 @@ func (pg *pg) GetDashboardById(ctx context.Context, id int64) ([]models.PipeLine
 }
 
 func (pg *pg) GetPipelineById(ctx context.Context, id int64) (models.PipeLineDto, error) {
-	fullpipeline, err := pg.Queries.GetPipelineById(ctx, id)
+	fullpipeline, err := pg.Queries.GetPipelineById(ctx, IntToPgType(id))
 	pipeline := models.PipeLineDto{}
 	if err != nil {
 		return models.PipeLineDto{}, err
@@ -69,19 +80,8 @@ func (pg *pg) GetPipelineById(ctx context.Context, id int64) (models.PipeLineDto
 	return pipeline, nil
 }
 
-// type PipeLineDto struct {
-// 	Id            int64             `json:"id"`
-// 	Title         string            `json:"title"`
-// 	Description   string            `json:"description"`
-// 	DataBlocks    []DataBlockDto    `json:"data_blocks"`
-// 	InputBlocks   []InputBlockDto   `json:"input_blocks"`
-// 	Widgets       []WidgetBlockDto  `json:"widgets"`
-// 	LLMs          []LLMDto          `json:"llms"`
-// 	VectorStores  []VectorStoreDto  `json:"vector_stores"`
-// 	TextSplitters []TextSplitterDto `json:"text_splitters"`
-// }
-
 func (pg *pg) CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error) {
+
 	newInputBlock, err := pg.Queries.CreateInputBlock(ctx, db.CreateInputBlockParams{
 		PipelineID: pgtype.Int8{
 			Int64: payload.PipeLineID,
@@ -97,8 +97,15 @@ func (pg *pg) CreateInputBlock(ctx context.Context, payload models.CreateInputBl
 }
 
 func (pg *pg) CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error) {
+
+	inputId := NewNull()
+
+	if payload.InputBlockId != 0 {
+		inputId = IntToPgType(payload.InputBlockId)
+	}
+
 	newDataBlock, err := pg.Queries.CreateDataBlock(ctx, db.CreateDataBlockParams{
-		InputBlockID:   IntToPgType(payload.InputBlockId),
+		InputBlockID:   inputId,
 		StorageUrl:     payload.Url,
 		StorageType:    payload.Type,
 		TextSplitterID: payload.TextSplitterId,
@@ -110,10 +117,22 @@ func (pg *pg) CreateDataBlock(ctx context.Context, payload models.CreateDataBloc
 	return int64(newDataBlock.ID), nil
 }
 func (pg *pg) CreateWidgetBlock(ctx context.Context, payload models.CreateWidgetBlock) (int64, error) {
+
+	inputId := NewNull()
+
+	if payload.LlmId != 0 {
+		inputId = IntToPgType(payload.LlmId)
+	}
+
+	temp, err := json.Marshal(payload.Styles)
+	if err != nil {
+		return 0, err
+	}
+
 	newWidgetBlock, err := pg.Queries.CreateWidgetBlock(ctx, db.CreateWidgetBlockParams{
-		LlmBlockID: IntToPgType(payload.LlmId),
+		LlmBlockID: inputId,
 		ImageUrl:   payload.ImageUrl,
-		Styles:     payload.Styles.(string),
+		Styles:     temp,
 	})
 	if err != nil {
 		return 0, err
@@ -121,8 +140,15 @@ func (pg *pg) CreateWidgetBlock(ctx context.Context, payload models.CreateWidget
 	return int64(newWidgetBlock.ID), nil
 }
 func (pg *pg) CreateTextSplitter(ctx context.Context, payload models.CreateTextSplitter) (int64, error) {
+
+	inputId := NewNull()
+
+	if payload.DataBlockID != 0 {
+		inputId = IntToPgType(payload.DataBlockID)
+	}
+
 	newTextSplitter, err := pg.Queries.CreateTextSplitter(ctx, db.CreateTextSplitterParams{
-		DataBlockID:  IntToPgType(payload.DataBlockID),
+		DataBlockID:  inputId,
 		SplitterType: payload.Type,
 		Config:       payload.Config.(string),
 	})
@@ -132,8 +158,15 @@ func (pg *pg) CreateTextSplitter(ctx context.Context, payload models.CreateTextS
 	return int64(newTextSplitter.ID), nil
 }
 func (pg *pg) CreateVectorStore(ctx context.Context, payload models.CreateVectorStore) (int64, error) {
+
+	inputId := NewNull()
+
+	if payload.DataBlockID != 0 {
+		inputId = IntToPgType(payload.DataBlockID)
+	}
+
 	newVectorStore, err := pg.Queries.CreateVectorStore(ctx, db.CreateVectorStoreParams{
-		DataBlockID:      IntToPgType(payload.DataBlockID),
+		DataBlockID:      inputId,
 		StoreType:        payload.Type,
 		CollectionName:   payload.CollectionName,
 		PersistDirectory: payload.PersistDirectory,
@@ -144,11 +177,18 @@ func (pg *pg) CreateVectorStore(ctx context.Context, payload models.CreateVector
 	return int64(newVectorStore.ID), nil
 }
 func (pg *pg) CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock) (int64, error) {
+
+	inputId := NewNull()
+
+	if payload.InputBlockId != 0 {
+		inputId = IntToPgType(payload.InputBlockId)
+	}
+
 	newLlmBlock, err := pg.Queries.CreateLlmBlock(ctx, db.CreateLlmBlockParams{
-		InputBlockID:  IntToPgType(payload.InputBlockId),
+		InputBlockID:  inputId,
 		LlmType:       payload.Type,
 		Model:         payload.Model,
-		Endpoint:      payload.Endpoint,
+		LlmEndpoint:   payload.Endpoint,
 		Prompt:        payload.Prompt,
 		Template:      payload.Template,
 		WidgetBlockID: payload.WidgetBlockId,

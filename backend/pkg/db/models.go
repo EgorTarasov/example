@@ -32,6 +32,7 @@ type InputBlock struct {
 type LlmBlock struct {
 	ID            int32
 	InputBlockID  pgtype.Int8
+	LlmEndpoint   string
 	LlmType       string
 	Model         string
 	Prompt        string
@@ -55,7 +56,7 @@ type OauthUser struct {
 
 type Pipeline struct {
 	ID                  int32
-	UserID              int64
+	UserID              pgtype.Int8
 	Title               string
 	PipelineDescription string
 	CreatedAt           pgtype.Timestamp
@@ -117,7 +118,7 @@ type WidgetBlock struct {
 	ID         int32
 	LlmBlockID pgtype.Int8
 	ImageUrl   string
-	Styles     string
+	Styles     []byte
 	CreatedAt  pgtype.Timestamp
 	UpdatedAt  pgtype.Timestamp
 }
