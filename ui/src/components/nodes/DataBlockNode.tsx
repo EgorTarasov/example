@@ -3,6 +3,7 @@ import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
 import { DataBlockDto } from '@/api/models/models';
+import { isValidConnection } from './utils';
 
 export type DataBlockNodeType = Node<{
     dto: DataBlockDto;
@@ -31,6 +32,7 @@ const DataBlockNode = ({ data, isConnectable }: NodeProps<DataBlockNodeType>) =>
                 position={Position.Top}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
+                isValidConnection={isValidConnection}
             />
             <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200">
                 <div className="flex flex-row gap-2 w-[500px] h-[300px]">
@@ -83,6 +85,7 @@ const DataBlockNode = ({ data, isConnectable }: NodeProps<DataBlockNodeType>) =>
                 id="a"
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
+                isValidConnection={isValidConnection}
             />
         </>
     );

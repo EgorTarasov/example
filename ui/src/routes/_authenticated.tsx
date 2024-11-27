@@ -1,20 +1,36 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { rootStore } from '../stores/RootStore.ts'
-// import Dashboard from "@/pages/authenticated/dashboard.tsx";
-import Constructor from "@/pages/authenticated/constructor.tsx";
+import { Navbar } from '@/components/navbar.tsx';
+import AuthApiService from '@/api/AuthApiService.ts';
+
 
 
 export const Route = createFileRoute('/_authenticated')({
-  beforeLoad: () => {
+  beforeLoad: async () => {
     if (!rootStore.token) {
-      throw redirect({
-        to: '/login',
-      })
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          await AuthApiService.me();
+        } catch (error) {
+          localStorage.removeItem('token');
+          throw redirect({
+            to: '/login',
+          });
+        }
+      } else {
+        throw redirect({
+          to: '/login',
+        });
+      }
     }
   },
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <Constructor />
+  return <>
+    <Navbar />
+    <Outlet />
+  </>
 }

@@ -1,4 +1,3 @@
-import { Navbar } from '@/components/navbar'
 import {
     addEdge, applyEdgeChanges, applyNodeChanges,
     Controls,
@@ -80,9 +79,6 @@ const Constructor = memo(function Constructor() {
 
     return (
 
-        <>
-            <Navbar />
-
             <main className="flex gap-4 p-4 h-screen">
                 <aside className="w-1/4 p-4 border-r border-gray-300">
                     <h2 className="text-xl font-bold mb-4">Available Node Types</h2>
@@ -126,7 +122,6 @@ const Constructor = memo(function Constructor() {
                     </div>
                 </div>
             </main>
-        </>
     )
 });
 

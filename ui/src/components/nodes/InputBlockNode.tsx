@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { InputBlockDto } from '@/api/models/models';
 import { Input } from "@/components/ui/input";
+import { isValidConnection } from './utils';
 
 export type InputBlockNodeType = Node<{
     dto: InputBlockDto;
@@ -18,6 +19,7 @@ const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) 
                 position={Position.Top}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
+                isValidConnection={isValidConnection}
             />
             <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200">
                 <div className="flex flex-col gap-2">
@@ -53,6 +55,7 @@ const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) 
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
+                isValidConnection={isValidConnection}
             />
         </>
     );
