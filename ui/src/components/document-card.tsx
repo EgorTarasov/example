@@ -1,49 +1,48 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CirclePlus } from "lucide-react";
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-
-
 import { useNavigate } from '@tanstack/react-router';
 import { useStores } from '@/hooks/useStores';
+import { useState } from 'react';
 
 interface DocumentCardProps {
-    name: string
-    count: number
+    title: string;
+    description: number;
 }
 
-
-
-export function DocumentCard({ name, count }: DocumentCardProps) {
+export function DocumentCard({ title, description }: DocumentCardProps) {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{name}</CardTitle>
+                <CardTitle className="text-sm font-medium">{title}</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{count}</div>
+                <div className="text-2xl font-bold">{description}</div>
                 <p className="text-xs text-muted-foreground">documents</p>
             </CardContent>
         </Card>
-    )
+    );
 }
 
-
-
 export const DocumentCardAdd = () => {
+    const [title, setTitle] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
     const { rootStore } = useStores();
     const navigate = useNavigate();
 
     const handleCreatePipeline = async () => {
-        await rootStore.createPipeline();
-        if (rootStore.currentPipelineId === undefined) {
+        await rootStore.createPipeline({
+            name: title,
+            description: description,
+        });
+        if (rootStore.currentPipelineId === undefined || rootStore.currentPipelineId === null) {
             return;
         }
         navigate({
             to: '/pipeline/' + rootStore.currentPipelineId
         });
-
-    }
+    };
 
     return (
         <Card className="p-4 shadow-lg rounded-lg">
@@ -55,11 +54,15 @@ export const DocumentCardAdd = () => {
                 <Input
                     type="text"
                     placeholder="Название"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
                 />
                 <Input
                     type="text"
                     placeholder="Описание"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
                 />
                 <Button
@@ -69,6 +72,6 @@ export const DocumentCardAdd = () => {
                     Добавить pipeline
                 </Button>
             </CardContent>
-        </Card >
+        </Card>
     );
 };

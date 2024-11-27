@@ -1,7 +1,7 @@
 import { LoginInfo, LoginResponse, MeResponse } from "@/models/auth.ts";
 import axios from "axios";
 import { RegisterInfo, RegisterResponse } from "@/api/models/register.ts";
-import { CreatePipeLine, CreatePipeLineResponse } from "./models/models";
+import { CreatePipeLine, CreatePipeLineResponse, PipeLineDashboardDto } from "./models/models";
 
 class ApiService {
     setAuthToken(token: string) {
@@ -26,6 +26,12 @@ class ApiService {
         const response = await axios.get<MeResponse>('/api/auth/me', {
 
         });
+
+        return response.data
+    }
+
+    public async getPipelines() {
+        const response = await axios.get<PipeLineDashboardDto[]>('/api/dashboard/', {});
 
         return response.data
     }

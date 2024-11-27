@@ -1,28 +1,55 @@
-import { DocumentCard, DocumentCardAdd } from '@/components/document-card'
-import { useStores } from '@/hooks/useStores';
-import { observer } from 'mobx-react';
+import React, { useEffect, useState } from 'react';
+import ApiService from '@/api/ApiService';
+import { PipeLineDashboardDto } from '@/api/models/models';
+import { DocumentCardAdd } from '@/components/document-card';
+import { Link } from '@tanstack/react-router';
 
-const documentTypes = [
-    { name: 'Invoices', count: 145 },
-    { name: 'Contracts', count: 67 },
-    { name: 'Proposals', count: 89 },
-    { name: 'Reports', count: 234 },
-]
-const Dashboard = observer(() => {
-    const rootStore = useStores();
+const Dashboard = () => {
+    const [pipelines, setPipelines] = useState<PipeLineDashboardDto[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchPipelines = async () => {
+            try {
+                const data = await ApiService.getPipelines();
+                setPipelines(data);
+            } catch (err) {
+                setError('Failed to fetch pipelines');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPipelines();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
-        <main className="flex-1 p-4 md:p-6">
+        <div>
             <h1 className="mb-4 text-2xl font-bold">Dashboard</h1>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {documentTypes.map((doc) => (
-                    <DocumentCard key={doc.name} name={doc.name} count={doc.count} />
+                {pipelines.map((pipeline) => (
+
+                    <div key={pipeline.id} className="p-4 border rounded shadow">
+                        <h2 className="text-lg font-semibold">{pipeline.title}</h2>
+                        <p>{pipeline.description}</p>
+                        <Link key={pipeline.id} to={`/pipeline/${pipeline.id}`}>Редактировать</Link>
+                    </div>
+
                 ))}
                 <DocumentCardAdd />
             </div>
-        </main>
-
-    )
-});
+        </div>
+    );
+};
 
 export default Dashboard;
+

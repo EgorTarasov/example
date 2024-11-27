@@ -48,15 +48,15 @@ export class RootStore {
     }
 
     async createPipeline() {
-        if (this.token) {
-            console.log('Creating pipeline');
-            const response = await apiService.createPipeLine({
-                name: 'New pipeline',
-                description: 'New pipeline description'
-            });
-            this.currentPipelineId = response.id;
-            console.log('Created pipeline with id ' + response.id);
-        }
+
+        console.log('Creating pipeline');
+        const response = await apiService.createPipeLine({
+            name: 'New pipeline',
+            description: 'New pipeline description'
+        });
+        this.currentPipelineId = response.id;
+        console.log('Created pipeline with id ' + response.id);
+
     }
 }
 

@@ -49,11 +49,26 @@ const Constructor = memo(function Constructor() {
         [setNodes],
     );
     const onEdgesChange: OnEdgesChange = useCallback(
-        (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+        (changes) => {
+            console.log('Edge changes:', changes);
+            return setEdges((eds) => {
+                const newEdges = applyEdgeChanges(changes, eds);
+                console.log('Updated edges:', newEdges);
+                return newEdges;
+            });
+        },
         [setEdges],
     );
+
     const onConnect: OnConnect = useCallback(
-        (connection) => setEdges((eds) => addEdge(connection, eds)),
+        (connection) => {
+            console.log('New connection:', connection);
+            return setEdges((eds) => {
+                const newEdges = addEdge(connection, eds);
+                console.log('Edges after connection:', newEdges);
+                return newEdges;
+            });
+        },
         [setEdges],
     );
 

@@ -9,6 +9,12 @@ export interface CreatePipeLineResponse {
     id: number;
 }
 
+export interface PipeLineDashboardDto {
+    id: number;
+    title: string;
+    description: string;
+}
+
 export interface PipeLineDto {
     id: number;
     name: string;
