@@ -8,3 +8,8 @@ export interface LoginResponse {
     type: string;
 }
 
+
+export interface MeResponse {
+    user_id: number;
+    role: string;
+}
