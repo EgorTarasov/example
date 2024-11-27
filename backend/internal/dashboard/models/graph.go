@@ -144,7 +144,13 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	)
 	// inputs and edges for data blocks and llms
 	for _, i := range p.InputBlocks {
-		nodes = append(nodes, i)
+		nodes = append(nodes, struct {
+			InputBlockDto
+			Block string `json:"block_type"`
+		}{
+			InputBlockDto: i,
+			Block:         "input_block",
+		})
 		if i.DataBlockID != 0 {
 			edges = append(edges, Edge{
 				Id:           strconv.FormatInt(i.Id, 10) + "-" + strconv.FormatInt(i.DataBlockID, 10),
@@ -166,7 +172,13 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 	// llms and edges for widgets
 	for _, llm := range p.LLMs {
-		nodes = append(nodes, llm)
+		nodes = append(nodes, struct {
+			LLMDto
+			Block string `json:"block_type"`
+		}{
+			LLMDto: llm,
+			Block:  "llm_block",
+		})
 		if llm.WidgetBlockID != 0 {
 			edges = append(edges, Edge{
 				Id:           strconv.FormatInt(llm.Id, 10) + "-" + strconv.FormatInt(llm.WidgetBlockID, 10),
@@ -179,7 +191,13 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 
 	for _, data := range p.DataBlocks {
-		nodes = append(nodes, data)
+		nodes = append(nodes, struct {
+			DataBlockDto
+			Block string `json:"block_type"`
+		}{
+			DataBlockDto: data,
+			Block:        "data_block",
+		})
 		if data.TextSplitterID != 0 {
 
 			edges = append(edges, Edge{
@@ -202,11 +220,33 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 
 	for _, splitter := range p.TextSplitters {
-		nodes = append(nodes, splitter)
+		nodes = append(nodes, struct {
+			TextSplitterDto
+			Block string `json:"block_type"`
+		}{
+			TextSplitterDto: splitter,
+			Block:           "text_splitter",
+		})
 	}
 
 	for _, store := range p.VectorStores {
-		nodes = append(nodes, store)
+		nodes = append(nodes, struct {
+			VectorStoreDto
+			Block string `json:"block_type"`
+		}{
+			VectorStoreDto: store,
+			Block:          "vector_store",
+		})
+	}
+
+	for _, widget := range p.Widgets {
+		nodes = append(nodes, struct {
+			WidgetBlockDto
+			Block string `json:"block_type"`
+		}{
+			WidgetBlockDto: widget,
+			Block:          "widget_block",
+		})
 	}
 
 	return PipeLine{

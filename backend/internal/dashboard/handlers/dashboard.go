@@ -34,11 +34,10 @@ func InitRoutes(api fiber.Router, view fiber.Router, h Handler) error {
 
 func initApi(api fiber.Router, h Handler) error {
 	dashboard := api.Group("/dashboard")
+	dashboard.Get("/", middleware.RoleMiddleware(auth.Admin), h.GetDashboardById)
 
 	pipeline := dashboard.Group("/pipeline")
 	pipeline.Post("/", middleware.RoleMiddleware(auth.Admin), h.CreatePipeline)
-
-	pipeline.Get("/", middleware.RoleMiddleware(auth.Admin), h.GetDashboardById)
 
 	eachPipeline := pipeline.Group("/:id")
 
