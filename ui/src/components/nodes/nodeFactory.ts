@@ -13,7 +13,7 @@ export type NodeData = {
     widget: WidgetBlockDto;
 };
 
-const defaultValues: NodeData = {
+export const defaultValues: NodeData = {
     dataBlock: {
         id: 0,
         type: 'txt',

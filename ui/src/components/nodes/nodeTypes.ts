@@ -11,11 +11,11 @@ import WidgetNodeType from "./WidgetNode";
 
 
 export const nodeTypes: NodeTypes = {
-    inputBlock: InputBlockNodeType,
-    dataBlock: DataBlockNode,
-    selectorNode: ColorSelectorNode,
-    llm: LLMNode,
-    textSplitter: TextSplitterNodeType,
-    vectorStore: VectorStoreNodeType,
-    widgetNode: WidgetNodeType,
+    input_block: InputBlockNodeType,
+    data_block: DataBlockNode,
+    selector_node: ColorSelectorNode,
+    llm_block: LLMNode,
+    text_splitter: TextSplitterNodeType,
+    vector_store: VectorStoreNodeType,
+    widget_block: WidgetNodeType,
 };

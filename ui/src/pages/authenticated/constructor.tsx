@@ -7,97 +7,156 @@ import {
     ReactFlow,
     ReactFlowProvider,
     type Node,
-    type Edge, OnNodeDrag,
+    type Edge,
+    useReactFlow,
+    useNodesState,
+    useEdgesState,
+    Panel,
 } from "@xyflow/react";
-
-import { memo, useCallback, useState, useEffect } from "react";
+import Dagre from '@dagrejs/dagre';
+import { memo, useCallback, useState, useEffect, useLayoutEffect } from "react";
 import { nodeTypes } from '@/components/nodes/nodeTypes';
 import { createNode } from '@/components/nodes/nodeFactory';
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import axios from "axios";
-// import { Route, useParams } from "@tanstack/react-router";
 
-const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
-
-const snapGrid: [number, number] = [20, 20];
-
-// const initialNodes: NodeInfo[] = [
-// ];
-
-// const initialEdges: EdgeInfo[] = [];
-
-const onNodeDrag: OnNodeDrag = (_, node) => {
-    console.log('drag event', node.data);
-};
 
 const Constructor = memo(function Constructor() {
 
     const { pipelineId } = useParams({ strict: false });
     console.log('pipelineId', pipelineId);
-    const endpoint = "https://larek.tech/api/dashboard/pipeline/";
+
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true)
 
-
-
-    // const handleTestConnection = async () => {
-    //     // setLoading(true);
-    //     try {
-    //         const payload = {
-    //             model: type,
-    //             prompt: prompt,
-    //             stream: false,
-    //         };
-    
-    //         const config = {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             // stream: false, // Set stream to false
-    //         };
-    
-    //         // Make an HTTP POST request to the Ollama API with the GenerateResponse type
-    //         const res = await axios.post<GenerateResponse>(endpoint, payload, config);
-    
-    //         // Access the 'response' field from the API response
-    //         setResponse(res.data.response);
-    //     } catch (error) {
-    //         console.error('Error testing connection:', error);
-    //         if (axios.isAxiosError(error) && error.response) {
-    //             setResponse(`Error: ${error.response.data.error || 'Unknown error'}`);
-    //         } else {
-    //             setResponse('Error testing connection');
-    //         }
-    //     } finally {
-    //         // setLoading(false);/
-    //         console.log('done')
-    //     }
-    // };
-
-    const handleLoad = async () => {
+    const fetchNodes = async (pipelineId: string = "0") => {
+        const endpoint = `https://larek.tech/api/dashboard/pipeline/${pipelineId}`;
         try {
-            const response = await axios.get(`${endpoint}${pipelineId}`);
-            const res = response.data;
-            console.log(res.nodes);
-            console.log(res);
-            setNodes(Array.isArray(res.nodes) ? res.nodes : []);
-            setEdges(Array.isArray(res.edges) ? res.edges : []);
-            setIsLoading(false)
-            
+            const response = await axios.get(endpoint);
+            const nodesObject = response.data.nodes;
+            const nodes = Object.values(nodesObject).map((node: any) => ({
+                id: node.id.toString(),
+                type: node.block_type,
+                data: { ...node }
+            }));
+            return nodes;
         } catch (error) {
-                console.error('Error testing connection:', error);
-               setNodes([]);
-               setEdges([]);
+            console.error('Error fetching nodes:', error);
+            return [];
+        }
+    
+    };
+
+    const fetchEdges = async (pipelineId: string = "0") => {
+        const endpoint = `https://larek.tech/api/dashboard/pipeline/${pipelineId}`;
+        try {
+            const response = await axios.get(endpoint);
+            const edges = response.data.edges;
+            console.log('edges', edges);
+            return edges;
+        } catch (error) {
+            console.error('Error fetching edges:', error);
+            return [];
         }
     }
-    //запрос при useEffect после загрузки страницы api/dashboard/pipeline:id
-    //id зависит от того на какой странице ты находишься 
 
-    useEffect(() => {
-        handleLoad();
-    }, []);
+    console.log(fetchNodes(pipelineId));
+
+    const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+
+        const getLayoutedElements = (nodes: any[], edges: any[], options: { direction: any; }) => {
+        g.setGraph({ rankdir: options.direction });
+
+        edges.forEach((edge) => g.setEdge(edge.source, edge.target));
+        nodes.forEach((node) => g.setNode(node.id, node));
+
+        Dagre.layout(g);
+
+        return {
+            nodes: nodes.map((node) => {
+            const { x, y } = g.node(node.id);
+
+            return { ...node, position: { x, y } };
+            }),
+            edges,
+        };
+        };
+
+    const LayoutFlow = () => {
+        const { fitView } = useReactFlow();
+        const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+        const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+        const [wasFetched, setWasFetched] = useState(false);
+        const getNodes = async () => {
+            const initialNodes = await fetchNodes(pipelineId);
+            setNodes(initialNodes.map((node) => ({ ...node, position: { x: 0, y: 0 } })));
+            console.log('initialNodes that were fethced', initialNodes);
+        };
+        const getEdges = async () => {
+            const initialEdges = await fetchEdges(pipelineId);
+            setEdges(initialEdges);
+            console.log('initialEdges that were fethced', initialEdges);
+        }
+
+        if (!wasFetched) {
+            useEffect(() => {
+                setWasFetched(true);
+                getEdges();
+                getNodes();
+            });
+        }
+        
+
+        useEffect(() => {
+            console.log('Nodes:', nodes);
+        });
+
+        
+
+        const onLayout = useCallback(
+            (direction: any) => {
+            const layouted = getLayoutedElements(nodes, edges, { direction });
+
+            setNodes([...layouted.nodes]);
+            setEdges([...layouted.edges]);
+
+            window.requestAnimationFrame(() => {
+                fitView();
+            });
+            },
+            [nodes, edges]
+        );
+
+
+        useLayoutEffect(() => {
+            onLayout('LR');
+        }, []);
+
+        return (
+            <div
+            style={{ height: '500px', width: '1000px', border: '1px solid black' }}
+            >
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                nodeTypes={nodeTypes}
+                fitView
+                style={{ width: '100%', height: '100%' }}
+            >
+                <Panel position="top-right">
+                <button onClick={() => onLayout('TB')}>vertical layout</button>
+                <button onClick={() => onLayout('LR')}>horizontal layout</button>
+                </Panel>
+            </ReactFlow>
+            </div>
+        );
+        };
+
+
 
     const onNodesChange: OnNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -154,14 +213,14 @@ const Constructor = memo(function Constructor() {
   
     const navigate = useNavigate();
     function handleButtonClick(): void {
-        // alert("Button clicked!");
         navigate({
             to: '/dashboard', 
         });
     }
-
-    return (
     
+    return (
+        
+
 
         <main className="flex gap-4 p-4 h-screen">
             <aside className="w-1/4 p-4 border-r border-gray-300">
@@ -193,7 +252,7 @@ const Constructor = memo(function Constructor() {
                     onDragOver={onDragOver}
                 >
                     <ReactFlowProvider>
-                        {isLoading ? (
+                        {/* {isLoading ? (
                             <p>Loading...</p>
                         ) : (
                             <ReactFlow
@@ -210,9 +269,11 @@ const Constructor = memo(function Constructor() {
                             style={{ width: '100%', height: '100%' }}
                         />
                         )
-                        }
+                        }*/}
+                        <LayoutFlow />
+
                         
-                        <Controls />
+                        <Controls /> 
                     </ReactFlowProvider>
                 </div>
             </div>
@@ -221,4 +282,3 @@ const Constructor = memo(function Constructor() {
 });
 
 export default Constructor;
-
