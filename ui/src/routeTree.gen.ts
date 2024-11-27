@@ -17,6 +17,7 @@ import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedSettingsImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedConstructorImport } from './routes/_authenticated/constructor'
+import { Route as AuthenticatedChatbotImport } from './routes/_authenticated/chatbot'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
 
@@ -59,6 +60,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardImport.update({
 const AuthenticatedConstructorRoute = AuthenticatedConstructorImport.update({
   id: '/constructor',
   path: '/constructor',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedChatbotRoute = AuthenticatedChatbotImport.update({
+  id: '/chatbot',
+  path: '/chatbot',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -113,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated/chatbot': {
+      id: '/_authenticated/chatbot'
+      path: '/chatbot'
+      fullPath: '/chatbot'
+      preLoaderRoute: typeof AuthenticatedChatbotImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/constructor': {
       id: '/_authenticated/constructor'
       path: '/constructor'
@@ -140,12 +154,14 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedChatbotRoute: typeof AuthenticatedChatbotRoute
   AuthenticatedConstructorRoute: typeof AuthenticatedConstructorRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedChatbotRoute: AuthenticatedChatbotRoute,
   AuthenticatedConstructorRoute: AuthenticatedConstructorRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
@@ -161,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutLazyRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/chatbot': typeof AuthenticatedChatbotRoute
   '/constructor': typeof AuthenticatedConstructorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -172,6 +189,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutLazyRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/chatbot': typeof AuthenticatedChatbotRoute
   '/constructor': typeof AuthenticatedConstructorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -184,6 +202,7 @@ export interface FileRoutesById {
   '/about': typeof AboutLazyRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/_authenticated/chatbot': typeof AuthenticatedChatbotRoute
   '/_authenticated/constructor': typeof AuthenticatedConstructorRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -197,6 +216,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/register'
+    | '/chatbot'
     | '/constructor'
     | '/dashboard'
     | '/settings'
@@ -207,6 +227,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/register'
+    | '/chatbot'
     | '/constructor'
     | '/dashboard'
     | '/settings'
@@ -217,6 +238,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/_authenticated/chatbot'
     | '/_authenticated/constructor'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
@@ -262,6 +284,7 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated.tsx",
       "children": [
+        "/_authenticated/chatbot",
         "/_authenticated/constructor",
         "/_authenticated/dashboard",
         "/_authenticated/settings"
@@ -275,6 +298,10 @@ export const routeTree = rootRoute
     },
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx"
+    },
+    "/_authenticated/chatbot": {
+      "filePath": "_authenticated/chatbot.tsx",
+      "parent": "/_authenticated"
     },
     "/_authenticated/constructor": {
       "filePath": "_authenticated/constructor.tsx",
