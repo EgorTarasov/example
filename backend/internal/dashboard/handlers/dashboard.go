@@ -34,8 +34,6 @@ func InitRoutes(api fiber.Router, view fiber.Router, h Handler) error {
 
 func initApi(api fiber.Router, h Handler) error {
 	dashboard := api.Group("/dashboard")
-	dashboard.Post("/datablock", h.CreateDataBlock)
-	dashboard.Post("/inputblock", h.CreateInputBlock)
 
 	pipeline := dashboard.Group("/pipeline")
 	pipeline.Post("/", middleware.RoleMiddleware(auth.Admin), h.CreatePipeline)
@@ -49,6 +47,8 @@ func initApi(api fiber.Router, h Handler) error {
 	eachPipeline.Post("/textsplitter", h.CreateTextSplitter)
 	eachPipeline.Post("/vectorstore", h.CreateVectorStore)
 	eachPipeline.Post("/llm", h.CreateLLMBlock)
+	eachPipeline.Post("/datablock", h.CreateDataBlock)
+	eachPipeline.Post("/inputblock", h.CreateInputBlock)
 
 	return nil
 }

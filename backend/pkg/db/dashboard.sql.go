@@ -12,9 +12,10 @@ import (
 )
 
 const createDataBlock = `-- name: CreateDataBlock :one
-INSERT INTO data_blocks(input_block_id, storage_url, storage_type, text_splitter_id, vector_store_id)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO data_blocks(pipeline_id,input_block_id, storage_url, storage_type, text_splitter_id, vector_store_id)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING id,
+    pipeline_id,
 	input_block_id,
 	storage_url,
     text_splitter_id,
@@ -24,6 +25,7 @@ RETURNING id,
 `
 
 type CreateDataBlockParams struct {
+	PipelineID     pgtype.Int8
 	InputBlockID   pgtype.Int8
 	StorageUrl     string
 	StorageType    string
@@ -33,6 +35,7 @@ type CreateDataBlockParams struct {
 
 type CreateDataBlockRow struct {
 	ID             int32
+	PipelineID     pgtype.Int8
 	InputBlockID   pgtype.Int8
 	StorageUrl     string
 	TextSplitterID int64
@@ -43,6 +46,7 @@ type CreateDataBlockRow struct {
 
 func (q *Queries) CreateDataBlock(ctx context.Context, arg CreateDataBlockParams) (CreateDataBlockRow, error) {
 	row := q.db.QueryRow(ctx, createDataBlock,
+		arg.PipelineID,
 		arg.InputBlockID,
 		arg.StorageUrl,
 		arg.StorageType,
@@ -52,6 +56,7 @@ func (q *Queries) CreateDataBlock(ctx context.Context, arg CreateDataBlockParams
 	var i CreateDataBlockRow
 	err := row.Scan(
 		&i.ID,
+		&i.PipelineID,
 		&i.InputBlockID,
 		&i.StorageUrl,
 		&i.TextSplitterID,
@@ -103,9 +108,10 @@ func (q *Queries) CreateInputBlock(ctx context.Context, arg CreateInputBlockPara
 }
 
 const createLlmBlock = `-- name: CreateLlmBlock :one
-INSERT INTO llm_blocks(input_block_id, llm_type, model, prompt, llm_endpoint, template, widget_block_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO llm_blocks(pipeline_id, input_block_id, llm_type, model, prompt, llm_endpoint, template, widget_block_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id,
+    pipeline_id,
     input_block_id,
     llm_type,
     model,
@@ -118,6 +124,7 @@ RETURNING id,
 `
 
 type CreateLlmBlockParams struct {
+	PipelineID    pgtype.Int8
 	InputBlockID  pgtype.Int8
 	LlmType       string
 	Model         string
@@ -129,6 +136,7 @@ type CreateLlmBlockParams struct {
 
 type CreateLlmBlockRow struct {
 	ID            int32
+	PipelineID    pgtype.Int8
 	InputBlockID  pgtype.Int8
 	LlmType       string
 	Model         string
@@ -142,6 +150,7 @@ type CreateLlmBlockRow struct {
 
 func (q *Queries) CreateLlmBlock(ctx context.Context, arg CreateLlmBlockParams) (CreateLlmBlockRow, error) {
 	row := q.db.QueryRow(ctx, createLlmBlock,
+		arg.PipelineID,
 		arg.InputBlockID,
 		arg.LlmType,
 		arg.Model,
@@ -153,6 +162,7 @@ func (q *Queries) CreateLlmBlock(ctx context.Context, arg CreateLlmBlockParams) 
 	var i CreateLlmBlockRow
 	err := row.Scan(
 		&i.ID,
+		&i.PipelineID,
 		&i.InputBlockID,
 		&i.LlmType,
 		&i.Model,
@@ -204,9 +214,10 @@ func (q *Queries) CreatePipeLine(ctx context.Context, arg CreatePipeLineParams) 
 }
 
 const createTextSplitter = `-- name: CreateTextSplitter :one
-INSERT INTO text_splitters(data_block_id, splitter_type, config)
-VALUES ($1, $2, $3)
+INSERT INTO text_splitters(pipeline_id, data_block_id, splitter_type, config)
+VALUES ($1, $2, $3, $4)
 RETURNING id,
+    pipeline_id,
 	data_block_id,
 	splitter_type,
 	config,
@@ -215,16 +226,33 @@ RETURNING id,
 `
 
 type CreateTextSplitterParams struct {
+	PipelineID   pgtype.Int8
 	DataBlockID  pgtype.Int8
 	SplitterType string
 	Config       string
 }
 
-func (q *Queries) CreateTextSplitter(ctx context.Context, arg CreateTextSplitterParams) (TextSplitter, error) {
-	row := q.db.QueryRow(ctx, createTextSplitter, arg.DataBlockID, arg.SplitterType, arg.Config)
-	var i TextSplitter
+type CreateTextSplitterRow struct {
+	ID           int32
+	PipelineID   pgtype.Int8
+	DataBlockID  pgtype.Int8
+	SplitterType string
+	Config       string
+	CreatedAt    pgtype.Timestamp
+	UpdatedAt    pgtype.Timestamp
+}
+
+func (q *Queries) CreateTextSplitter(ctx context.Context, arg CreateTextSplitterParams) (CreateTextSplitterRow, error) {
+	row := q.db.QueryRow(ctx, createTextSplitter,
+		arg.PipelineID,
+		arg.DataBlockID,
+		arg.SplitterType,
+		arg.Config,
+	)
+	var i CreateTextSplitterRow
 	err := row.Scan(
 		&i.ID,
+		&i.PipelineID,
 		&i.DataBlockID,
 		&i.SplitterType,
 		&i.Config,
@@ -235,9 +263,10 @@ func (q *Queries) CreateTextSplitter(ctx context.Context, arg CreateTextSplitter
 }
 
 const createVectorStore = `-- name: CreateVectorStore :one
-INSERT INTO vector_stores(data_block_id, store_type, collection_name, persist_directory)
-VALUES ($1, $2, $3, $4)
+INSERT INTO vector_stores(pipeline_id, data_block_id, store_type, collection_name, persist_directory)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id,
+    pipeline_id,
 	data_block_id,
 	store_type,
 	collection_name,
@@ -247,22 +276,36 @@ RETURNING id,
 `
 
 type CreateVectorStoreParams struct {
+	PipelineID       pgtype.Int8
 	DataBlockID      pgtype.Int8
 	StoreType        string
 	CollectionName   string
 	PersistDirectory string
 }
 
-func (q *Queries) CreateVectorStore(ctx context.Context, arg CreateVectorStoreParams) (VectorStore, error) {
+type CreateVectorStoreRow struct {
+	ID               int32
+	PipelineID       pgtype.Int8
+	DataBlockID      pgtype.Int8
+	StoreType        string
+	CollectionName   string
+	PersistDirectory string
+	CreatedAt        pgtype.Timestamp
+	UpdatedAt        pgtype.Timestamp
+}
+
+func (q *Queries) CreateVectorStore(ctx context.Context, arg CreateVectorStoreParams) (CreateVectorStoreRow, error) {
 	row := q.db.QueryRow(ctx, createVectorStore,
+		arg.PipelineID,
 		arg.DataBlockID,
 		arg.StoreType,
 		arg.CollectionName,
 		arg.PersistDirectory,
 	)
-	var i VectorStore
+	var i CreateVectorStoreRow
 	err := row.Scan(
 		&i.ID,
+		&i.PipelineID,
 		&i.DataBlockID,
 		&i.StoreType,
 		&i.CollectionName,
@@ -274,9 +317,10 @@ func (q *Queries) CreateVectorStore(ctx context.Context, arg CreateVectorStorePa
 }
 
 const createWidgetBlock = `-- name: CreateWidgetBlock :one
-INSERT INTO widget_blocks(llm_block_id, image_url, styles)
-VALUES ($1, $2, $3)
+INSERT INTO widget_blocks(pipeline_id, llm_block_id, image_url, styles)
+VALUES ($1, $2, $3, $4)
 RETURNING id,
+    pipeline_id
 	llm_block_id,
 	image_url,
 	styles,
@@ -285,14 +329,29 @@ RETURNING id,
 `
 
 type CreateWidgetBlockParams struct {
+	PipelineID pgtype.Int8
 	LlmBlockID pgtype.Int8
 	ImageUrl   string
 	Styles     []byte
 }
 
-func (q *Queries) CreateWidgetBlock(ctx context.Context, arg CreateWidgetBlockParams) (WidgetBlock, error) {
-	row := q.db.QueryRow(ctx, createWidgetBlock, arg.LlmBlockID, arg.ImageUrl, arg.Styles)
-	var i WidgetBlock
+type CreateWidgetBlockRow struct {
+	ID         int32
+	LlmBlockID pgtype.Int8
+	ImageUrl   string
+	Styles     []byte
+	CreatedAt  pgtype.Timestamp
+	UpdatedAt  pgtype.Timestamp
+}
+
+func (q *Queries) CreateWidgetBlock(ctx context.Context, arg CreateWidgetBlockParams) (CreateWidgetBlockRow, error) {
+	row := q.db.QueryRow(ctx, createWidgetBlock,
+		arg.PipelineID,
+		arg.LlmBlockID,
+		arg.ImageUrl,
+		arg.Styles,
+	)
+	var i CreateWidgetBlockRow
 	err := row.Scan(
 		&i.ID,
 		&i.LlmBlockID,
@@ -337,74 +396,119 @@ func (q *Queries) GetDashboardById(ctx context.Context, userID pgtype.Int8) ([]P
 	return items, nil
 }
 
-const getPipelineById = `-- name: GetPipelineById :one
-SElECT pipelines.id, user_id, title, pipeline_description, pipelines.created_at, pipelines.updated_at, pipelines.deleted_at, input_blocks.id, pipeline_id, input_blocks.data_block_id, llm_id, input_blocks.created_at, input_blocks.updated_at, input_blocks.deleted_at, data_blocks.id, data_blocks.input_block_id, storage_url, storage_type, text_splitter_id, vector_store_id, data_blocks.created_at, data_blocks.updated_at, llm_blocks.id, llm_blocks.input_block_id, llm_endpoint, llm_type, model, prompt, template, widget_block_id, llm_blocks.created_at, llm_blocks.updated_at, widget_blocks.id, llm_block_id, image_url, styles, widget_blocks.created_at, widget_blocks.updated_at, text_splitters.id, text_splitters.data_block_id, splitter_type, config, text_splitters.created_at, text_splitters.updated_at, vector_stores.id, vector_stores.data_block_id, store_type, collection_name, persist_directory, vector_stores.created_at, vector_stores.updated_at from pipelines
-INNER JOIN input_blocks ON pipelines.id=input_blocks.pipeline_id
-INNER JOIN data_blocks ON input_blocks.id=data_blocks.input_block_id
-INNER JOIN llm_blocks ON input_blocks.id=llm_blocks.input_block_id
-INNER JOIN widget_blocks ON llm_blocks.id=widget_blocks.llm_block_id
-INNER JOIN text_splitters ON data_blocks.id=text_splitters.data_block_id
-INNER JOIN vector_stores ON data_blocks.id=vector_stores.data_block_id
-WHERE user_id = $1
+const getDataBlocksById = `-- name: GetDataBlocksById :many
+SELECT id, input_block_id, storage_url, storage_type, text_splitter_id, vector_store_id, created_at, updated_at, pipeline_id FROM data_blocks
+WHERE pipeline_id = $1
 `
 
-type GetPipelineByIdRow struct {
-	ID                  int32
-	UserID              pgtype.Int8
-	Title               string
-	PipelineDescription string
-	CreatedAt           pgtype.Timestamp
-	UpdatedAt           pgtype.Timestamp
-	DeletedAt           pgtype.Timestamp
-	ID_2                int32
-	PipelineID          pgtype.Int8
-	DataBlockID         int64
-	LlmID               int64
-	CreatedAt_2         pgtype.Timestamp
-	UpdatedAt_2         pgtype.Timestamp
-	DeletedAt_2         pgtype.Timestamp
-	ID_3                int32
-	InputBlockID        pgtype.Int8
-	StorageUrl          string
-	StorageType         string
-	TextSplitterID      int64
-	VectorStoreID       int64
-	CreatedAt_3         pgtype.Timestamp
-	UpdatedAt_3         pgtype.Timestamp
-	ID_4                int32
-	InputBlockID_2      pgtype.Int8
-	LlmEndpoint         string
-	LlmType             string
-	Model               string
-	Prompt              string
-	Template            string
-	WidgetBlockID       int64
-	CreatedAt_4         pgtype.Timestamp
-	UpdatedAt_4         pgtype.Timestamp
-	ID_5                int32
-	LlmBlockID          pgtype.Int8
-	ImageUrl            string
-	Styles              []byte
-	CreatedAt_5         pgtype.Timestamp
-	UpdatedAt_5         pgtype.Timestamp
-	ID_6                int32
-	DataBlockID_2       pgtype.Int8
-	SplitterType        string
-	Config              string
-	CreatedAt_6         pgtype.Timestamp
-	UpdatedAt_6         pgtype.Timestamp
-	ID_7                int32
-	DataBlockID_3       pgtype.Int8
-	StoreType           string
-	CollectionName      string
-	PersistDirectory    string
-	CreatedAt_7         pgtype.Timestamp
-	UpdatedAt_7         pgtype.Timestamp
+func (q *Queries) GetDataBlocksById(ctx context.Context, pipelineID pgtype.Int8) ([]DataBlock, error) {
+	rows, err := q.db.Query(ctx, getDataBlocksById, pipelineID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []DataBlock
+	for rows.Next() {
+		var i DataBlock
+		if err := rows.Scan(
+			&i.ID,
+			&i.InputBlockID,
+			&i.StorageUrl,
+			&i.StorageType,
+			&i.TextSplitterID,
+			&i.VectorStoreID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PipelineID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-func (q *Queries) GetPipelineById(ctx context.Context, userID pgtype.Int8) (GetPipelineByIdRow, error) {
-	row := q.db.QueryRow(ctx, getPipelineById, userID)
-	var i GetPipelineByIdRow
+const getInputBlocksById = `-- name: GetInputBlocksById :many
+SELECT id, pipeline_id, data_block_id, llm_id, created_at, updated_at, deleted_at FROM input_blocks
+WHERE pipeline_id = $1
+`
+
+func (q *Queries) GetInputBlocksById(ctx context.Context, pipelineID pgtype.Int8) ([]InputBlock, error) {
+	rows, err := q.db.Query(ctx, getInputBlocksById, pipelineID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []InputBlock
+	for rows.Next() {
+		var i InputBlock
+		if err := rows.Scan(
+			&i.ID,
+			&i.PipelineID,
+			&i.DataBlockID,
+			&i.LlmID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLlmBlocksById = `-- name: GetLlmBlocksById :many
+SELECT id, input_block_id, llm_endpoint, llm_type, model, prompt, template, widget_block_id, created_at, updated_at, pipeline_id FROM llm_blocks
+WHERE pipeline_id = $1
+`
+
+func (q *Queries) GetLlmBlocksById(ctx context.Context, pipelineID pgtype.Int8) ([]LlmBlock, error) {
+	rows, err := q.db.Query(ctx, getLlmBlocksById, pipelineID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []LlmBlock
+	for rows.Next() {
+		var i LlmBlock
+		if err := rows.Scan(
+			&i.ID,
+			&i.InputBlockID,
+			&i.LlmEndpoint,
+			&i.LlmType,
+			&i.Model,
+			&i.Prompt,
+			&i.Template,
+			&i.WidgetBlockID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PipelineID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPipelineInfoById = `-- name: GetPipelineInfoById :one
+SELECT id, user_id, title, pipeline_description, created_at, updated_at, deleted_at FROM pipelines
+WHERE id = $1
+`
+
+func (q *Queries) GetPipelineInfoById(ctx context.Context, id int32) (Pipeline, error) {
+	row := q.db.QueryRow(ctx, getPipelineInfoById, id)
+	var i Pipeline
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
@@ -413,50 +517,106 @@ func (q *Queries) GetPipelineById(ctx context.Context, userID pgtype.Int8) (GetP
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
-		&i.ID_2,
-		&i.PipelineID,
-		&i.DataBlockID,
-		&i.LlmID,
-		&i.CreatedAt_2,
-		&i.UpdatedAt_2,
-		&i.DeletedAt_2,
-		&i.ID_3,
-		&i.InputBlockID,
-		&i.StorageUrl,
-		&i.StorageType,
-		&i.TextSplitterID,
-		&i.VectorStoreID,
-		&i.CreatedAt_3,
-		&i.UpdatedAt_3,
-		&i.ID_4,
-		&i.InputBlockID_2,
-		&i.LlmEndpoint,
-		&i.LlmType,
-		&i.Model,
-		&i.Prompt,
-		&i.Template,
-		&i.WidgetBlockID,
-		&i.CreatedAt_4,
-		&i.UpdatedAt_4,
-		&i.ID_5,
-		&i.LlmBlockID,
-		&i.ImageUrl,
-		&i.Styles,
-		&i.CreatedAt_5,
-		&i.UpdatedAt_5,
-		&i.ID_6,
-		&i.DataBlockID_2,
-		&i.SplitterType,
-		&i.Config,
-		&i.CreatedAt_6,
-		&i.UpdatedAt_6,
-		&i.ID_7,
-		&i.DataBlockID_3,
-		&i.StoreType,
-		&i.CollectionName,
-		&i.PersistDirectory,
-		&i.CreatedAt_7,
-		&i.UpdatedAt_7,
 	)
 	return i, err
+}
+
+const getTextSplittersById = `-- name: GetTextSplittersById :many
+SELECT id, data_block_id, splitter_type, config, created_at, updated_at, pipeline_id FROM text_splitters
+WHERE pipeline_id = $1
+`
+
+func (q *Queries) GetTextSplittersById(ctx context.Context, pipelineID pgtype.Int8) ([]TextSplitter, error) {
+	rows, err := q.db.Query(ctx, getTextSplittersById, pipelineID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TextSplitter
+	for rows.Next() {
+		var i TextSplitter
+		if err := rows.Scan(
+			&i.ID,
+			&i.DataBlockID,
+			&i.SplitterType,
+			&i.Config,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PipelineID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getVectorStoresById = `-- name: GetVectorStoresById :many
+SELECT id, data_block_id, store_type, collection_name, persist_directory, created_at, updated_at, pipeline_id FROM vector_stores
+WHERE pipeline_id = $1
+`
+
+func (q *Queries) GetVectorStoresById(ctx context.Context, pipelineID pgtype.Int8) ([]VectorStore, error) {
+	rows, err := q.db.Query(ctx, getVectorStoresById, pipelineID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []VectorStore
+	for rows.Next() {
+		var i VectorStore
+		if err := rows.Scan(
+			&i.ID,
+			&i.DataBlockID,
+			&i.StoreType,
+			&i.CollectionName,
+			&i.PersistDirectory,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PipelineID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWidgetBlocksById = `-- name: GetWidgetBlocksById :many
+SELECT id, llm_block_id, image_url, styles, created_at, updated_at, pipeline_id FROM widget_blocks
+WHERE pipeline_id = $1
+`
+
+func (q *Queries) GetWidgetBlocksById(ctx context.Context, pipelineID pgtype.Int8) ([]WidgetBlock, error) {
+	rows, err := q.db.Query(ctx, getWidgetBlocksById, pipelineID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []WidgetBlock
+	for rows.Next() {
+		var i WidgetBlock
+		if err := rows.Scan(
+			&i.ID,
+			&i.LlmBlockID,
+			&i.ImageUrl,
+			&i.Styles,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PipelineID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

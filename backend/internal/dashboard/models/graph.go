@@ -61,6 +61,7 @@ type InputBlockDto struct {
 }
 
 type CreateDataBlock struct {
+	PipeLineID     int64  `json:"pipeline_id"`
 	InputBlockId   int64  `json:"input_block_id"`
 	Type           string `json:"type"` // txt,pdf, notion, confluence
 	Url            string `json:"url"`
@@ -77,6 +78,7 @@ type DataBlockDto struct {
 }
 
 type CreateTextSplitter struct {
+	PipeLineID  int64       `json:"pipeline_id"`
 	DataBlockID int64       `json:"data_block_id"`
 	Type        string      `json:"type"` // regex, split
 	Config      interface{} `json:"config"`
@@ -89,6 +91,7 @@ type TextSplitterDto struct {
 }
 
 type CreateVectorStore struct {
+	PipeLineID       int64  `json:"pipeline_id"`
 	DataBlockID      int64  `json:"data_block_id"`
 	Type             string `json:"type"` // clichouse, pgvector
 	CollectionName   string `json:"collection_name"`
@@ -101,9 +104,10 @@ type VectorStoreDto struct {
 	CollectionName string `json:"collection_name"`
 }
 type CreateWidgetBlock struct {
-	LlmId    int64       `json:"llm_id"`
-	ImageUrl string      `json:"image_url"`
-	Styles   interface{} `json:"styles"`
+	PipeLineID int64       `json:"pipeline_id"`
+	LlmId      int64       `json:"llm_id"`
+	ImageUrl   string      `json:"image_url"`
+	Styles     interface{} `json:"styles"`
 }
 
 type WidgetBlockDto struct {
@@ -113,6 +117,7 @@ type WidgetBlockDto struct {
 }
 
 type CreateLLMBlock struct {
+	PipeLineID    int64  `json:"pipeline_id"`
 	InputBlockId  int64  `json:"input_block_id"`
 	Type          string `json:"type"`
 	Endpoint      string `json:"endpoint"`

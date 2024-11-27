@@ -68,14 +68,97 @@ func (pg *pg) GetDashboardById(ctx context.Context, id int64) ([]models.PipeLine
 }
 
 func (pg *pg) GetPipelineById(ctx context.Context, id int64) (models.PipeLineDto, error) {
-	fullpipeline, err := pg.Queries.GetPipelineById(ctx, IntToPgType(id))
 	pipeline := models.PipeLineDto{}
+
+	inputblocks, err := pg.Queries.GetInputBlocksById(ctx, IntToPgType(id))
 	if err != nil {
 		return models.PipeLineDto{}, err
 	}
-	pipeline.Id = int64(fullpipeline.ID)
-	pipeline.Title = fullpipeline.Title
-	pipeline.Description = fullpipeline.PipelineDescription
+
+	for i := range inputblocks {
+		pipeline.InputBlocks = append(pipeline.InputBlocks, models.InputBlockDto{
+			Id:          int64(inputblocks[i].ID),
+			DataBlockID: inputblocks[i].DataBlockID,
+			PipeLineID:  inputblocks[i].PipelineID.Int64,
+			LLMID:       inputblocks[i].LlmID,
+			CreatedAt:   inputblocks[i].CreatedAt.Time.String(),
+			UpdateAt:    inputblocks[i].CreatedAt.Time.String(),
+		})
+	}
+
+	datablocks, err := pg.Queries.GetDataBlocksById(ctx, IntToPgType(id))
+	if err != nil {
+		return models.PipeLineDto{}, err
+	}
+	for i := range datablocks {
+		pipeline.DataBlocks = append(pipeline.DataBlocks, models.DataBlockDto{
+			Id:             int64(datablocks[i].ID),
+			Type:           datablocks[i].StorageType,
+			Url:            datablocks[i].StorageUrl,
+			TextSplitterID: datablocks[i].TextSplitterID,
+		})
+	}
+
+	widgetblocks, err := pg.Queries.GetWidgetBlocksById(ctx, IntToPgType(id))
+	if err != nil {
+		return models.PipeLineDto{}, err
+	}
+	for i := range widgetblocks {
+		pipeline.Widgets = append(pipeline.Widgets, models.WidgetBlockDto{
+			Id:       int64(datablocks[i].ID),
+			Styles:   widgetblocks[i].Styles,
+			ImageUrl: widgetblocks[i].ImageUrl,
+		})
+	}
+
+	llms, err := pg.Queries.GetLlmBlocksById(ctx, IntToPgType(id))
+	if err != nil {
+		return models.PipeLineDto{}, err
+	}
+	for i := range llms {
+		pipeline.LLMs = append(pipeline.LLMs, models.LLMDto{
+			Id:            int64(llms[i].ID),
+			Type:          llms[i].LlmType,
+			Endpoint:      llms[i].LlmEndpoint,
+			Model:         llms[i].Model,
+			Prompt:        llms[i].Prompt,
+			Template:      llms[i].Template,
+			WidgetBlockID: llms[i].WidgetBlockID,
+		})
+	}
+
+	vectorstores, err := pg.Queries.GetVectorStoresById(ctx, IntToPgType(id))
+	if err != nil {
+		return models.PipeLineDto{}, err
+	}
+	for i := range vectorstores {
+		pipeline.VectorStores = append(pipeline.VectorStores, models.VectorStoreDto{
+			Id:             int64(vectorstores[i].ID),
+			Type:           vectorstores[i].StoreType,
+			CollectionName: vectorstores[i].CollectionName,
+		})
+	}
+
+	textsplitters, err := pg.Queries.GetTextSplittersById(ctx, IntToPgType(id))
+	if err != nil {
+		return models.PipeLineDto{}, err
+	}
+	for i := range textsplitters {
+		pipeline.TextSplitters = append(pipeline.TextSplitters, models.TextSplitterDto{
+			Id:          int64(textsplitters[i].ID),
+			Type:        textsplitters[i].SplitterType,
+			Config:      textsplitters[i].Config,
+			DataBlockID: textsplitters[i].DataBlockID.Int64,
+		})
+	}
+
+	pipelineInfo, err := pg.Queries.GetPipelineInfoById(ctx, int32(id))
+	if err != nil {
+		return models.PipeLineDto{}, err
+	}
+	pipeline.Id = int64(pipelineInfo.ID)
+	pipeline.Title = pipelineInfo.Title
+	pipeline.Description = pipelineInfo.PipelineDescription
 
 	return pipeline, nil
 }
@@ -105,6 +188,7 @@ func (pg *pg) CreateDataBlock(ctx context.Context, payload models.CreateDataBloc
 	}
 
 	newDataBlock, err := pg.Queries.CreateDataBlock(ctx, db.CreateDataBlockParams{
+		PipelineID:     IntToPgType(payload.PipeLineID),
 		InputBlockID:   inputId,
 		StorageUrl:     payload.Url,
 		StorageType:    payload.Type,
@@ -130,6 +214,7 @@ func (pg *pg) CreateWidgetBlock(ctx context.Context, payload models.CreateWidget
 	}
 
 	newWidgetBlock, err := pg.Queries.CreateWidgetBlock(ctx, db.CreateWidgetBlockParams{
+		PipelineID: IntToPgType(payload.PipeLineID),
 		LlmBlockID: inputId,
 		ImageUrl:   payload.ImageUrl,
 		Styles:     temp,
@@ -148,6 +233,7 @@ func (pg *pg) CreateTextSplitter(ctx context.Context, payload models.CreateTextS
 	}
 
 	newTextSplitter, err := pg.Queries.CreateTextSplitter(ctx, db.CreateTextSplitterParams{
+		PipelineID:   IntToPgType(payload.PipeLineID),
 		DataBlockID:  inputId,
 		SplitterType: payload.Type,
 		Config:       payload.Config.(string),
@@ -166,6 +252,7 @@ func (pg *pg) CreateVectorStore(ctx context.Context, payload models.CreateVector
 	}
 
 	newVectorStore, err := pg.Queries.CreateVectorStore(ctx, db.CreateVectorStoreParams{
+		PipelineID:       IntToPgType(payload.PipeLineID),
 		DataBlockID:      inputId,
 		StoreType:        payload.Type,
 		CollectionName:   payload.CollectionName,
@@ -176,6 +263,7 @@ func (pg *pg) CreateVectorStore(ctx context.Context, payload models.CreateVector
 	}
 	return int64(newVectorStore.ID), nil
 }
+
 func (pg *pg) CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock) (int64, error) {
 
 	inputId := NewNull()
@@ -185,6 +273,7 @@ func (pg *pg) CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock)
 	}
 
 	newLlmBlock, err := pg.Queries.CreateLlmBlock(ctx, db.CreateLlmBlockParams{
+		PipelineID:    IntToPgType(payload.PipeLineID),
 		InputBlockID:  inputId,
 		LlmType:       payload.Type,
 		Model:         payload.Model,

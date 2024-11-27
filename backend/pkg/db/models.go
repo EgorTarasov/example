@@ -17,6 +17,7 @@ type DataBlock struct {
 	VectorStoreID  int64
 	CreatedAt      pgtype.Timestamp
 	UpdatedAt      pgtype.Timestamp
+	PipelineID     pgtype.Int8
 }
 
 type InputBlock struct {
@@ -40,6 +41,7 @@ type LlmBlock struct {
 	WidgetBlockID int64
 	CreatedAt     pgtype.Timestamp
 	UpdatedAt     pgtype.Timestamp
+	PipelineID    pgtype.Int8
 }
 
 type OauthProvider struct {
@@ -89,6 +91,7 @@ type TextSplitter struct {
 	Config       string
 	CreatedAt    pgtype.Timestamp
 	UpdatedAt    pgtype.Timestamp
+	PipelineID   pgtype.Int8
 }
 
 type User struct {
@@ -112,6 +115,7 @@ type VectorStore struct {
 	PersistDirectory string
 	CreatedAt        pgtype.Timestamp
 	UpdatedAt        pgtype.Timestamp
+	PipelineID       pgtype.Int8
 }
 
 type WidgetBlock struct {
@@ -121,4 +125,5 @@ type WidgetBlock struct {
 	Styles     []byte
 	CreatedAt  pgtype.Timestamp
 	UpdatedAt  pgtype.Timestamp
+	PipelineID pgtype.Int8
 }
