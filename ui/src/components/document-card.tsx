@@ -45,7 +45,7 @@ export const DocumentCardAdd = () => {
     };
 
     return (
-        <Card className="p-4 shadow-lg rounded-lg">
+        <Card className="p-4 m-4 shadow-lg rounded-lg">
             <CardHeader className="flex flex-col items-center justify-center space-y-2 pb-4">
                 <CirclePlus size={64} className="text-blue-500" />
                 <p className="text-lg font-semibold">Добавить новый pipeline</p>

@@ -11,21 +11,21 @@ import {
 } from "@xyflow/react";
 
 import { memo, useCallback, useState, useEffect } from "react";
-import { EdgeInfo, NodeInfo } from "@/models/nodeInfo.ts";
 import { nodeTypes } from '@/components/nodes/nodeTypes';
 import { createNode } from '@/components/nodes/nodeFactory';
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import axios from "axios";
 // import { Route, useParams } from "@tanstack/react-router";
 
 const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
 
 const snapGrid: [number, number] = [20, 20];
 
-const initialNodes: NodeInfo[] = [
-];
+// const initialNodes: NodeInfo[] = [
+// ];
 
-const initialEdges: EdgeInfo[] = [];
+// const initialEdges: EdgeInfo[] = [];
 
 const onNodeDrag: OnNodeDrag = (_, node) => {
     console.log('drag event', node.data);
@@ -33,17 +33,70 @@ const onNodeDrag: OnNodeDrag = (_, node) => {
 
 const Constructor = memo(function Constructor() {
 
-    // const { pipelineId } = useParams({ strict: false });
-    // console.log('pipelineId', pipelineId);
+    const { pipelineId } = useParams({ strict: false });
+    console.log('pipelineId', pipelineId);
+    const endpoint = "https://larek.tech/api/dashboard/pipeline/";
+    const [nodes, setNodes] = useState<Node[]>([]);
+    const [edges, setEdges] = useState<Edge[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true)
 
-    const [nodes, setNodes] = useState<Node[]>(initialNodes);
-    const [edges, setEdges] = useState<Edge[]>(initialEdges);
+
+
+    // const handleTestConnection = async () => {
+    //     // setLoading(true);
+    //     try {
+    //         const payload = {
+    //             model: type,
+    //             prompt: prompt,
+    //             stream: false,
+    //         };
+    
+    //         const config = {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             // stream: false, // Set stream to false
+    //         };
+    
+    //         // Make an HTTP POST request to the Ollama API with the GenerateResponse type
+    //         const res = await axios.post<GenerateResponse>(endpoint, payload, config);
+    
+    //         // Access the 'response' field from the API response
+    //         setResponse(res.data.response);
+    //     } catch (error) {
+    //         console.error('Error testing connection:', error);
+    //         if (axios.isAxiosError(error) && error.response) {
+    //             setResponse(`Error: ${error.response.data.error || 'Unknown error'}`);
+    //         } else {
+    //             setResponse('Error testing connection');
+    //         }
+    //     } finally {
+    //         // setLoading(false);/
+    //         console.log('done')
+    //     }
+    // };
+
+    const handleLoad = async () => {
+        try {
+            const response = await axios.get(`${endpoint}${pipelineId}`);
+            const res = response.data;
+            console.log(res.nodes);
+            console.log(res);
+            setNodes(Array.isArray(res.nodes) ? res.nodes : []);
+            setEdges(Array.isArray(res.edges) ? res.edges : []);
+            setIsLoading(false)
+            
+        } catch (error) {
+                console.error('Error testing connection:', error);
+               setNodes([]);
+               setEdges([]);
+        }
+    }
+    //запрос при useEffect после загрузки страницы api/dashboard/pipeline:id
+    //id зависит от того на какой странице ты находишься 
 
     useEffect(() => {
-        setNodes([]);
-
-        setEdges([
-        ]);
+        handleLoad();
     }, []);
 
     const onNodesChange: OnNodesChange = useCallback(
@@ -106,6 +159,7 @@ const Constructor = memo(function Constructor() {
             to: '/dashboard', 
         });
     }
+
     return (
     
 
@@ -139,7 +193,10 @@ const Constructor = memo(function Constructor() {
                     onDragOver={onDragOver}
                 >
                     <ReactFlowProvider>
-                        <ReactFlow
+                        {isLoading ? (
+                            <p>Loading...</p>
+                        ) : (
+                            <ReactFlow
                             nodes={nodes}
                             nodeTypes={nodeTypes}
                             edges={edges}
@@ -152,6 +209,9 @@ const Constructor = memo(function Constructor() {
                             defaultViewport={defaultViewport}
                             style={{ width: '100%', height: '100%' }}
                         />
+                        )
+                        }
+                        
                         <Controls />
                     </ReactFlowProvider>
                 </div>
@@ -161,3 +221,4 @@ const Constructor = memo(function Constructor() {
 });
 
 export default Constructor;
+

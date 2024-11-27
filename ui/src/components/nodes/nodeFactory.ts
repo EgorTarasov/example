@@ -1,6 +1,8 @@
 import { Node } from '@xyflow/react';
 import { DataBlockDto, InputBlockDto, LLMDto, TextSplitterDto, VectorStoreDto, WidgetBlockDto } from '@/api/models/models';
 
+import axios from 'axios';
+
 
 export type NodeData = {
     dataBlock: DataBlockDto;
@@ -54,7 +56,9 @@ const defaultValues: NodeData = {
     }
 };
 
-export function createNode(type: string, position: { x: number, y: number }): Node {
+
+export function createNode(type: string, position: { x: number  , y: number } = {x: 0, y: 0}): Node {
+    let nodeId = '';
     const nodeTypes = {
         dataBlock: { type: 'dataBlock', data: { dto: defaultValues.dataBlock } },
         inputBlock: { type: 'inputBlock', data: { dto: defaultValues.inputBlock } },
@@ -63,11 +67,29 @@ export function createNode(type: string, position: { x: number, y: number }): No
         vectorStore: { type: 'vectorStore', data: { dto: defaultValues.vectorStore } },
         widget: { type: 'widget', data: { dto: defaultValues.widget } }
     };
+    function getCurrentURL () {
+        return window.location.href
+    };
+    const url = getCurrentURL();
+    console.log(url);
+    type NodeType = 'dataBlock' | 'inputBlock' | 'llm' | 'textSplitter' | 'vectorStore' | 'widget';
+    
+    interface resID {
+        id: string
+    }
+    const handleCreate = async () => {
+        const endpoint = `https://larek.tech/api/dashboard/pipeline/11/${type}`
+        const typeValue: NodeType = type as NodeType;
 
+        const res = await axios.post<resID>(endpoint, nodeTypes[typeValue].data);
+        nodeId = res.data.id;
+    }
+    
+    handleCreate();   
     return {
-        id: `${Date.now()}`,
+        id: `${nodeId}`,
         type,
-        position,
+        position: position,
         data: nodeTypes[type as keyof typeof nodeTypes]?.data || { label: `${type} node` },
     };
 }

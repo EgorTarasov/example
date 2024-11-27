@@ -26,39 +26,7 @@ const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
         { value: 'gemma:7b-instruct-q3_K_S', label: 'gemma' },
         { value: 'llama3.2', label: 'llama3.2 3b' },
     ];
-//7869
-    
-    //3 try
-    
-    // const handleTestConnection = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const payload = {
-    //             model: type, // Use selected model from state
-    //             prompt: prompt,
-    //             stream: false,
-    //         };
 
-    //         const config = {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             stream: false, 
-    //         };
-    //         console.log("i've tried(")
-    //         console.log(`endpoint ${endpoint} \n payload \n ${payload.model} \n ${payload.prompt}`)
-    //         // Make an HTTP POST request to the Ollama API
-    //         const res = await axios.post<GenerateResponse>(endpoint, payload, {});
-
-    //         // Assuming the API returns a JSON response with a 'reply' field
-    //         setResponse(res.response);
-    //     } catch (error) {
-    //         console.error('Error testing connection:', error);
-    //         setResponse('Error testing connection');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     const handleTestConnection = async () => {
         // setLoading(true);

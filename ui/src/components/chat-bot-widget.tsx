@@ -1,3 +1,4 @@
+// chat-bot-widget.tsx
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { Button } from "@/components/ui/button"
@@ -6,31 +7,29 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { MessageCircle, Send, X } from 'lucide-react'
 import { Message } from "@/models/message"
-import { CustomTheme } from '@/models/customTheme'
+import { CustomTheme, defaultTheme } from '@/models/customTheme'
 
-const defaultTheme: CustomTheme = {bgColor: "bg-secondary",
-    headerColor: "bg-green-500",
-    textColor: "text-primary",
-    buttonColor: "bg-sky-500",
-    sendButtonColor: "bg-sky-500",
-    messageColor: "bg-muted",
-    userMessageColor: "bg-sky-500",
+
+interface ChatBotWidgetProps {
+    customTheme: CustomTheme;
 }
 
-export function ChatBotWidget() {
+
+
+export function ChatBotWidget({ customTheme = defaultTheme  }: ChatBotWidgetProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState<{ text: string; isUser: boolean }[]>([])
     const [inputMessage, setInputMessage] = useState('')
     const ws = useRef<WebSocket | null>(null)
     const messagesRef = useRef<HTMLDivElement>(null);
-    const [customTheme, setCustomTheme] = useState<CustomTheme>(defaultTheme);
+
     useEffect(() => {
         if (isOpen) {
             ws.current = new WebSocket('wss://larek.tech/api/chat/ws/1')
 
             ws.current.onmessage = (event) => {
                 const message: Message = JSON.parse(event.data)
-                setMessages(prev => [...prev, {token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiZG9jdG9yIiwic3ViIjoiMiIsImV4cCI6MTczMjc0NjQyNX0.bhnRobq9hipWB_EMoUgjJL1sUEoRkTd3XPZFCxd54pQ", text: message.text, isUser: false }])
+                setMessages(prev => [...prev, { text: message.text, isUser: false }])
             }
 
             ws.current.onclose = () => {
@@ -44,20 +43,17 @@ export function ChatBotWidget() {
     }, [isOpen])
 
     const scrollToBottom = () => {
-        messagesRef.current?.scrollIntoView(false)
+        messagesRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
 
     useEffect(() => {
         scrollToBottom()
     }, [])
+
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-    // useEffect(() => {
-    //     if(messagesRef.current){
-    //         messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
-    //     }
-    // }, [messages]);
+
     const handleSendMessage = () => {
         if (!inputMessage.trim() || !ws.current) return
 
@@ -77,22 +73,11 @@ export function ChatBotWidget() {
         setInputMessage('')
     }   
 
-    useEffect(() =>setCustomTheme({
-        bgColor: "bg-secondary",
-        headerColor: "bg-white-500",
-        textColor: "text-primary",
-        buttonColor: "bg-secondary",
-        sendButtonColor: "bg-sky-500",
-        messageColor: "bg-muted",
-        userMessageColor: "bg-sky-500",
-    }),[])
-
     return (
         <div className="fixed bottom-4 right-4 z-50 w-120">
             {isOpen ? (
-                <Card className={`w-100 max-w-120 max-h-[calc(100vh-2rem)] flex flex-col overflow-y-auto `}>
+                <Card className={`w-100 max-w-120 max-h-[calc(100vh-2rem)] flex flex-col overflow-y-auto ${customTheme.bgColor}`}>
                     <CardHeader className={`flex ${customTheme.headerColor} flex-row items-center justify-between space-y-0 pb-2`}>
-
                         <h2 className={` ${customTheme.textColor} text-sm font-bold`}>Chat Bot</h2>
                         <Button className={`${customTheme.buttonColor}`} variant="secondary" size="icon" onClick={() => setIsOpen(false)}>
                             <X className="h-4 w-4" />
@@ -108,13 +93,12 @@ export function ChatBotWidget() {
                                             msg.isUser
                                                 ? `${customTheme.userMessageColor} text-primary-foreground ml-auto`
                                                 : `${customTheme.messageColor}`
-                                        } max-w-[60%]break-words ${msg.isUser ? 'ml-auto ml-4' : 'mr-auto mr-4'}`}
+                                        } max-w-[60%] break-words ${msg.isUser ? 'ml-4' : 'mr-4'}`}
                                     >
                                         {msg.text}
                                     </div>
                                 ))}
                             </div>
-
                         </ScrollArea>
                     </CardContent>
                     <CardFooter>
@@ -130,8 +114,11 @@ export function ChatBotWidget() {
                                 placeholder="Type your message..."
                                 value={inputMessage}
                                 onChange={(e) => setInputMessage(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') { handleSendMessage() }
+                                }}
                             />
-                            <Button className={`${customTheme.sendButtonColor}`}type="submit" size="icon">
+                            <Button className={`${customTheme.sendButtonColor}`} type="submit" size="icon">
                                 <Send className="h-4 w-4" />
                             </Button>
                         </form>

@@ -7,7 +7,7 @@ import ColorSelectorNode from "./ColorSelectorNode";
 import LLMNode from "./LLMNode";
 import TextSplitterNodeType from "./TextSplitterNode";
 import VectorStoreNodeType from "./VectorStoreNode";
-import { ChatBotWidget } from "../chat-bot-widget";
+import WidgetNodeType from "./WidgetNode";
 
 
 export const nodeTypes: NodeTypes = {
@@ -17,5 +17,5 @@ export const nodeTypes: NodeTypes = {
     llm: LLMNode,
     textSplitter: TextSplitterNodeType,
     vectorStore: VectorStoreNodeType,
-    widget: ChatBotWidget,
+    widgetNode: WidgetNodeType,
 };
