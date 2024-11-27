@@ -9,7 +9,7 @@ import (
 )
 
 type DataBlock struct {
-	ID             int64
+	ID             int32
 	InputBlockID   pgtype.Int8
 	StorageUrl     string
 	StorageType    string
@@ -20,7 +20,7 @@ type DataBlock struct {
 }
 
 type InputBlock struct {
-	ID          int64
+	ID          int32
 	PipelineID  pgtype.Int8
 	DataBlockID int64
 	LlmID       int64
@@ -30,7 +30,7 @@ type InputBlock struct {
 }
 
 type LlmBlock struct {
-	ID            int64
+	ID            int32
 	InputBlockID  pgtype.Int8
 	LlmType       string
 	Model         string
@@ -54,7 +54,7 @@ type OauthUser struct {
 }
 
 type Pipeline struct {
-	ID                  int64
+	ID                  int32
 	UserID              int64
 	Title               string
 	PipelineDescription string
@@ -82,7 +82,7 @@ type TelegramDatum struct {
 }
 
 type TextSplitter struct {
-	ID           int64
+	ID           int32
 	DataBlockID  pgtype.Int8
 	SplitterType string
 	Config       string
@@ -104,7 +104,7 @@ type UserRole struct {
 }
 
 type VectorStore struct {
-	ID               int64
+	ID               int32
 	DataBlockID      pgtype.Int8
 	StoreType        string
 	CollectionName   string
@@ -114,7 +114,7 @@ type VectorStore struct {
 }
 
 type WidgetBlock struct {
-	ID         int64
+	ID         int32
 	LlmBlockID pgtype.Int8
 	ImageUrl   string
 	Styles     string

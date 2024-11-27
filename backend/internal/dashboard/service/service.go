@@ -13,6 +13,8 @@ type service struct {
 
 type Service interface {
 	CreatePipeline(ctx context.Context, payload models.CreatePipeLine) (int64, error)
+	GetDashboardById(ctx context.Context, id int64) ([]models.PipeLineDashboardDto, error)
+
 	// CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error)
 	// CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error)
 	// CreateWidgetBlock(ctx context.Context, payload models.CreateWidgetBlock) (int64, error)
@@ -30,6 +32,14 @@ func New(graphRepo repo.GraphRepo) Service {
 func (s *service) CreatePipeline(ctx context.Context, payload models.CreatePipeLine) (int64, error) {
 	return s.graph.CreatePipeline(ctx, payload)
 }
+
+func (s *service) GetDashboardById(ctx context.Context, id int64) ([]models.PipeLineDashboardDto, error) {
+	return s.graph.GetDashboardById(ctx, id)
+}
+
+// func (s *service) GetPipelineById(ctx context.Context, id int64) (models.PipeLineDto, error) {
+// 	return
+// }
 
 // func (s *service) CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error) {
 // 	return s.graph.CreateDataBlock(ctx, payload)

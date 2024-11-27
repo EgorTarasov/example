@@ -29,7 +29,23 @@ func (pg *pg) CreatePipeline(ctx context.Context, payload models.CreatePipeLine)
 	if err != nil {
 		return 0, err
 	}
-	return newPipeline.ID, nil
+	return int64(newPipeline.ID), nil
+}
+
+func (pg *pg) GetDashboardById(ctx context.Context, id int64) ([]models.PipeLineDashboardDto, error) {
+	dashboard, err := pg.Queries.GetDashboardById(ctx, id)
+	dashboardPipelines := []models.PipeLineDashboardDto{}
+	if err != nil {
+		return []models.PipeLineDashboardDto{}, err
+	}
+	for i := range dashboard {
+		dashboardPipelines = append(dashboardPipelines, models.PipeLineDashboardDto{
+			Id:          int64(dashboard[i].ID),
+			Title:       dashboard[i].Title,
+			Description: dashboard[i].PipelineDescription,
+		})
+	}
+	return dashboardPipelines, nil
 }
 
 // func (pg *pg) CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error) {

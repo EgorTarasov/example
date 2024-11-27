@@ -16,7 +16,7 @@ import (
 // @Success 201 {object} map[string]interface{} "id"
 // @Failure 400 {object} map[string]interface{} "error"
 // @Failure 500 {object} map[string]interface{} "error"
-// @Router /api/dashboard/pipelines [post]
+// @Router /api/dashboard/pipeline [post]
 // @Security BearerAuth
 func (h *handler) CreatePipeline(c *fiber.Ctx) error {
 	userData := c.Locals("userData").(authModels.UserData)
@@ -34,6 +34,48 @@ func (h *handler) CreatePipeline(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"id": id})
 }
+
+// GetDashboardById godoc
+// @Summary Retrieve a dashboard by its ID
+// @Description Retrieve a specific dashboard for the authenticated user using its ID
+// @Tags dashboards
+// @Accept json
+// @Produce json
+// @Success 200 {object} []models.PipeLineDashboardDto "Dashboard details"
+// @Failure 400 {object} map[string]interface{} "error"
+// @Failure 500 {object} map[string]interface{} "error"
+// @Router /api/dashboard/ [get]
+// @Security BearerAuth
+func (h *handler) GetDashboardById(c *fiber.Ctx) error {
+
+	userData := c.Locals("userData").(authModels.UserData)
+
+	id := userData.UserID
+	dashboard, err := h.s.GetDashboardById(c.Context(), id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(dashboard)
+
+}
+
+// func (h *handler) GetPipelineById(c *fiber.Ctx) error {
+
+// 	idStr := c.Params("id")
+// 	id, err := strconv.ParseInt(idStr, 10, 64)
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+// 	}
+
+// 	pipelineDto, err := h.s.GetPipelineById(c.Context(), id)
+// 	if err != nil {
+// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+// 	}
+// 	pipeline := pipelineDto.ToPipeLine()
+// 	return c.JSON(pipeline)
+
+// }
 
 // func (h *handler) CreateInputBlock(c *fiber.Ctx) error {
 // 	var payload models.CreateInputBlock

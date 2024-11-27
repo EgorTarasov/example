@@ -28,7 +28,7 @@ type CreatePipeLineParams struct {
 }
 
 type CreatePipeLineRow struct {
-	ID        int64
+	ID        int32
 	UserID    int64
 	Title     string
 	CreatedAt pgtype.Timestamp
@@ -46,4 +46,37 @@ func (q *Queries) CreatePipeLine(ctx context.Context, arg CreatePipeLineParams) 
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getDashboardById = `-- name: GetDashboardById :many
+SELECT id, user_id, title, pipeline_description, created_at, updated_at, deleted_at from pipelines
+WHERE user_id = $1
+`
+
+func (q *Queries) GetDashboardById(ctx context.Context, userID int64) ([]Pipeline, error) {
+	rows, err := q.db.Query(ctx, getDashboardById, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Pipeline
+	for rows.Next() {
+		var i Pipeline
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.PipelineDescription,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

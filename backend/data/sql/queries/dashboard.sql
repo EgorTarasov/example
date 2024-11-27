@@ -7,6 +7,16 @@ RETURNING id,
     created_at,
     updated_at;
 
+-- name: GetDashboardById :many
+SELECT * from pipelines
+WHERE user_id = $1;
+
+-- name: GetPipelineById :one
+SElECT * from pipelines
+WHERE user_id = $1
+JOIN input_blocks ON pipelines.Id=input_blocks.pipeline_id
+JOIN data_blocks ON input_blocks.Id=data_blocks.input_block_id
+JOIN llm_blocks ON input_blocks.Id=llm_blocks.input_block_id
 	-- CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error)
 	-- CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error)
 	-- CreateWidgetBlock(ctx context.Context, payload models.CreateWidgetBlock) (int64, error)

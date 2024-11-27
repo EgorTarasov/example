@@ -118,7 +118,52 @@
                 }
             }
         },
-        "/api/dashboard/pipelines": {
+        "/api/dashboard/": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a specific dashboard for the authenticated user using its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dashboards"
+                ],
+                "summary": "Retrieve a dashboard by its ID",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PipeLineDashboardDto"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dashboard/pipeline": {
             "post": {
                 "security": [
                     {
@@ -229,6 +274,20 @@
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.PipeLineDashboardDto": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },

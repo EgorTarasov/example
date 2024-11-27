@@ -13,6 +13,7 @@ type handler struct {
 
 type Handler interface {
 	CreatePipeline(*fiber.Ctx) error
+	GetDashboardById(*fiber.Ctx) error
 	// CreateInputBlock(*fiber.Ctx) error
 	// CreateDataBlock(*fiber.Ctx) error
 	// CreateWidgetBlock(*fiber.Ctx) error
@@ -36,6 +37,8 @@ func initApi(api fiber.Router, h Handler) error {
 	// dashboard.Post("/datablock", h.CreateDataBlock)
 	// dashboard.Post("/inputblock", h.CreateInputBlock)
 	dashboard.Post("/pipeline", middleware.RoleMiddleware(auth.Admin), h.CreatePipeline)
+	dashboard.Get("/", middleware.RoleMiddleware(auth.Admin), h.GetDashboardById)
+	// dashboard.Get("/pipeline/:id", middleware.RoleMiddleware(auth.Admin), h.GetPipelineById)
 	// dashboard.Post("/widgetblock", h.CreateWidgetBlock)
 	// dashboard.Post("/textsplitterblock", h.CreateTextSplitter)
 	// dashboard.Post("/vectorstoreblock", h.CreateVectorStore)

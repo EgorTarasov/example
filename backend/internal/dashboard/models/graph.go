@@ -1,10 +1,14 @@
 package models
 
+import "strconv"
+
 type Edge struct {
-	Id       string `json:"id"`
-	Source   string `json:"source"`
-	Target   string `json:"target"`
-	Animated bool   `json:"animated"`
+	Id           string `json:"id"`
+	Source       string `json:"source"`
+	Target       string `json:"target"`
+	Animated     bool   `json:"animated"`
+	SourceHandle string `json:"sourceHandle"`
+	TargetHandle string `json:"targetHandle"`
 }
 
 type CreatePipeLine struct {
@@ -25,12 +29,18 @@ type PipeLineDto struct {
 	TextSplitters []TextSplitterDto `json:"text_splitters"`
 }
 
+type PipeLineDashboardDto struct {
+	Id          int64  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
 type PipeLine struct {
 	Id          int64         `json:"id"`
 	Title       string        `json:"title"`
 	Description string        `json:"description"`
 	Nodes       []interface{} `json:"nodes"`
-	Edges       []interface{} `json:"edges"`
+	Edges       []Edge        `json:"edges"`
 	CreatedAt   string        `json:"Created_at"`
 	UpdateAt    string        `json:"update_at"`
 }
@@ -110,4 +120,74 @@ type LLMDto struct {
 	Prompt        string `json:"prompt"`
 	Template      string `json:"template"`
 	WidgetBlockID int64  `json:"widget_block_id"`
+}
+
+func (p PipeLineDto) ToPipeLine() PipeLine {
+	var (
+		nodes []interface{}
+		edges []Edge
+	)
+	// inputs and edges for data blocks and llms
+	for _, i := range p.InputBlocks {
+		nodes = append(nodes, i)
+		edges = append(edges, Edge{
+			Id:           strconv.FormatInt(i.Id, 10) + "-" + strconv.FormatInt(i.DataBlockID, 10),
+			Source:       strconv.FormatInt(i.Id, 10),
+			Target:       strconv.FormatInt(i.DataBlockID, 10),
+			SourceHandle: "inputBlock|" + strconv.FormatInt(i.Id, 10) + "|source",
+			TargetHandle: "dataBlock|" + strconv.FormatInt(i.DataBlockID, 10) + "|target",
+		})
+		edges = append(edges, Edge{
+			Id:           strconv.FormatInt(i.Id, 10) + "-" + strconv.FormatInt(i.LLMID, 10),
+			Source:       strconv.FormatInt(i.Id, 10),
+			Target:       strconv.FormatInt(i.LLMID, 10),
+			SourceHandle: "inputBlock|" + strconv.FormatInt(i.Id, 10) + "|source",
+			TargetHandle: "llm|" + strconv.FormatInt(i.LLMID, 10) + "|target",
+		})
+	}
+	// llms and edges for widgets
+	for _, llm := range p.LLMs {
+		nodes = append(nodes, llm)
+		edges = append(edges, Edge{
+			Id:           strconv.FormatInt(llm.Id, 10) + "-" + strconv.FormatInt(llm.WidgetBlockID, 10),
+			Source:       strconv.FormatInt(llm.Id, 10),
+			Target:       strconv.FormatInt(llm.WidgetBlockID, 10),
+			SourceHandle: "llm|" + strconv.FormatInt(llm.Id, 10) + "|source",
+			TargetHandle: "widget|" + strconv.FormatInt(llm.WidgetBlockID, 10) + "|target",
+		})
+	}
+
+	for _, data := range p.DataBlocks {
+		nodes = append(nodes, data)
+		edges = append(edges, Edge{
+			Id:           strconv.FormatInt(data.Id, 10) + "-" + strconv.FormatInt(data.TextSplitterID, 10),
+			Source:       strconv.FormatInt(data.Id, 10),
+			Target:       strconv.FormatInt(data.TextSplitterID, 10),
+			SourceHandle: "dataBlock|" + strconv.FormatInt(data.Id, 10) + "|source",
+			TargetHandle: "textSplitter|" + strconv.FormatInt(data.TextSplitterID, 10) + "|target",
+		})
+		edges = append(edges, Edge{
+			Id:           strconv.FormatInt(data.Id, 10) + "-" + strconv.FormatInt(data.VectorStoreID, 10),
+			Source:       strconv.FormatInt(data.Id, 10),
+			Target:       strconv.FormatInt(data.VectorStoreID, 10),
+			SourceHandle: "dataBlock|" + strconv.FormatInt(data.Id, 10) + "|source",
+			TargetHandle: "vectorStore|" + strconv.FormatInt(data.VectorStoreID, 10) + "|target",
+		})
+	}
+
+	for _, splitter := range p.TextSplitters {
+		nodes = append(nodes, splitter)
+	}
+
+	for _, store := range p.VectorStores {
+		nodes = append(nodes, store)
+	}
+
+	return PipeLine{
+		Id:          p.Id,
+		Title:       p.Title,
+		Description: p.Description,
+		Edges:       edges,
+		Nodes:       nodes,
+	}
 }

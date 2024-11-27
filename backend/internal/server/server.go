@@ -15,6 +15,9 @@ import (
 	chatHandlers "github.com/EgorTarasov/example/internal/chat/handlers"
 	chatService "github.com/EgorTarasov/example/internal/chat/service"
 
+	dashboardHandlers "github.com/EgorTarasov/example/internal/dashboard/handlers"
+	dashboardRepos "github.com/EgorTarasov/example/internal/dashboard/repo"
+	dashboardService "github.com/EgorTarasov/example/internal/dashboard/service"
 	_ "github.com/EgorTarasov/example/internal/docs"
 	"github.com/EgorTarasov/example/pkg/postgres"
 	"github.com/gofiber/fiber/v2"
@@ -97,6 +100,11 @@ func NewServer(cfg *Config) Server {
 	chatHandlers.InitRoutes(api, views, chatHandler)
 
 	go chatHandler.HandleMessages()
+
+	dashboardRepo := dashboardRepos.NewPgRepo(pool)
+	dashboardService := dashboardService.New(dashboardRepo)
+	dashboardHandler := dashboardHandlers.NewHandler(dashboardService)
+	dashboardHandlers.InitRoutes(api, views, dashboardHandler)
 
 	return &server{
 		app:    app,
