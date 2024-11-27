@@ -6,6 +6,6 @@ export interface RegisterInfo {
 }
 
 export interface RegisterResponse {
-    accessToken: string;
+    access_token: string;
     type: string;
 }

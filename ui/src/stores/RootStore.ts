@@ -21,10 +21,9 @@ export class RootStore {
 
     loadToken() {
         const token = localStorage.getItem('token');
-        console.log('Loaded token: ' + token);
         if (token) {
             this.token = {
-                accessToken: token,
+                access_token: token,
                 type: 'Bearer',
             };
             apiService.setAuthToken(token);
@@ -35,15 +34,13 @@ export class RootStore {
     async login(loginInfo: LoginInfo) {
         const token = await apiService.login(loginInfo);
         this.token = token;
-        this.saveToken(token.accessToken);
-        console.log(this.token);
+        this.saveToken(token.access_token);
     }
 
     async singup(registerInfo: RegisterInfo) {
         const token = await apiService.register(registerInfo);
         this.token = token;
-        console.log('Registered, token:' + this.token);
-        this.saveToken(token.accessToken);
+        this.saveToken(token.access_token);
     }
 
     async logout() {

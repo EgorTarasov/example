@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_authenticated')({
       const token = localStorage.getItem('token');
       if (token) {
         try {
+          ApiService.setAuthToken(token);
           await ApiService.me();
         } catch (error) {
           localStorage.removeItem('token');

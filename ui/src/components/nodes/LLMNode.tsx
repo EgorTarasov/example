@@ -2,26 +2,28 @@ import { memo, useState } from 'react';
 import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
-import { DataBlockDto } from '@/api/models/models';
+import { LLMDto } from '@/api/models/models';
 import { isValidConnection } from './utils';
 
-export type DataBlockNodeType = Node<{
-    dto: DataBlockDto;
-}, 'dataBlock'>;
+export type LLMNodeType = Node<{
+    dto: LLMDto;
+}, 'llm'>;
 
-const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>) => {
+const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
     const [type, setType] = useState(data.dto.type);
-    const [url, setUrl] = useState(data.dto.url);
+    const [endpoint, setEndpoint] = useState(data.dto.endpoint);
 
     const typeOptions = [
-        { value: 'txt', label: 'Text' },
-        { value: 'pdf', label: 'PDF' },
-        { value: 'notion', label: 'Notion' },
-        { value: 'confluence', label: 'Confluence' }
+        { value: 'mistral', label: 'mistral 7b' },
+        { value: 'llama3.1', label: 'llama3.1 8b' },
+        { value: 'llama3.2:3b', label: 'llama3.2 3b' },
+        { value: 'custom', label: 'custom' }
     ];
 
-    const handleParse = () => {
-        console.log('Parsing data...');
+    const handleTestConnection = () => {
+        console.log('Testing connection...');
+
+        
     };
 
     return (
@@ -29,7 +31,7 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
             <Handle
                 type="target"
                 position={Position.Top}
-                id={`dataBlock|${id}|target`}
+                id={`llm|${id}|target`}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
                 isValidConnection={isValidConnection}
@@ -37,7 +39,7 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
             <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200">
                 <div className="flex flex-row gap-2 w-[500px] h-[300px]">
                     <div className="flex flex-col gap-2 w-1/2">
-                        <div className="font-bold text-sm border-b pb-2">Data Block</div>
+                        <div className="font-bold text-sm border-b pb-2">LLM Node</div>
                         <div className="text-xs space-y-2">
                             <div>ID: {data.dto.id}</div>
                             <Select
@@ -58,31 +60,24 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
                             <Input
                                 className="nodrag"
                                 type="text"
-                                value={url}
-                                onChange={(e) => setUrl(e.target.value)}
-                                placeholder="Enter URL"
+                                value={endpoint}
+                                onChange={(e) => setEndpoint(e.target.value)}
+                                placeholder="Enter Endpoint"
                             />
                             <button
                                 className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-                                onClick={handleParse}
+                                onClick={handleTestConnection}
                             >
-                                Parse
+                                Test Connection
                             </button>
                         </div>
-                    </div>
-                    <div className="flex-1 overflow-hidden w-1/2">
-                        <iframe
-                            src={url}
-                            className="w-full h-full border-0"
-                            title="Preview"
-                        />
                     </div>
                 </div>
             </div>
             <Handle
                 type="source"
                 position={Position.Bottom}
-                id={`dataBlock|${id}|source`}
+                id={`llm|${id}|source`}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
                 isValidConnection={isValidConnection}
@@ -91,4 +86,4 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
     );
 };
 
-export default memo(DataBlockNode);
+export default memo(LLMNode);

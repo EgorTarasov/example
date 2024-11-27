@@ -1,6 +1,6 @@
-// nodeFactory.ts
 import { Node } from '@xyflow/react';
 import { DataBlockDto, InputBlockDto, LLMDto, TextSplitterDto, VectorStoreDto, WidgetBlockDto } from '@/api/models/models';
+
 
 export type NodeData = {
     dataBlock: DataBlockDto;
@@ -29,7 +29,7 @@ const defaultValues: NodeData = {
     },
     llm: {
         id: 0,
-        type: '',
+        type: 'gpt3',
         endpoint: '',
         model: '',
         prompt: '',
@@ -58,11 +58,10 @@ export function createNode(type: string, position: { x: number, y: number }): No
     const nodeTypes = {
         dataBlock: { type: 'dataBlock', data: { dto: defaultValues.dataBlock } },
         inputBlock: { type: 'inputBlock', data: { dto: defaultValues.inputBlock } },
-        // llm: { type: 'llm', data: { dto: defaultValues.llm } },
-        // textSplitter: { type: 'textSplitter', data: { dto: defaultValues.textSplitter } },
-        // vectorStore: { type: 'vectorStore', data: { dto: defaultValues.vectorStore } },
-        // widget: { type: 'widget', data: { dto: defaultValues.widget } }
-        colorSelector: { type: 'colorSelector', data: { label: 'Color Selector' } },
+        llm: { type: 'llm', data: { dto: defaultValues.llm } },
+        textSplitter: { type: 'textSplitter', data: { dto: defaultValues.textSplitter } },
+        vectorStore: { type: 'vectorStore', data: { dto: defaultValues.vectorStore } },
+        widget: { type: 'widget', data: { dto: defaultValues.widget } }
     };
 
     return {

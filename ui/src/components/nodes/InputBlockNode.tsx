@@ -8,7 +8,7 @@ export type InputBlockNodeType = Node<{
     dto: InputBlockDto;
 }, 'inputBlock'>;
 
-const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) => {
+const InputBlockNode = ({ data, isConnectable, id }: NodeProps<InputBlockNodeType>) => {
     const [dataBlockId, setDataBlockId] = useState(data.dto.dataBlockId);
     const [llmId, setLlmId] = useState(data.dto.llmId);
 
@@ -17,6 +17,7 @@ const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) 
             <Handle
                 type="target"
                 position={Position.Top}
+                id={`inputBlock|${id}|target`}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
                 isValidConnection={isValidConnection}
@@ -53,6 +54,7 @@ const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) 
             <Handle
                 type="source"
                 position={Position.Bottom}
+                id={`inputBlock|${id}|source`}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
                 isValidConnection={isValidConnection}

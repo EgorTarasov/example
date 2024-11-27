@@ -26,13 +26,13 @@ const initialNodes: NodeInfo[] = [
 const initialEdges: EdgeInfo[] = [];
 
 const onNodeDrag: OnNodeDrag = (_, node) => {
-    console.log('drag event', node.data);
+    // console.log('drag event', node.data);
 };
 
 const Constructor = memo(function Constructor() {
 
     const { pipelineId } = useParams({ strict: false });
-    console.log('pipelineId', pipelineId);
+    // console.log('pipelineId', pipelineId);
 
     const [nodes, setNodes] = useState<Node[]>(initialNodes);
     const [edges, setEdges] = useState<Edge[]>(initialEdges);
@@ -85,7 +85,7 @@ const Constructor = memo(function Constructor() {
 
         <main className="flex gap-4 p-4 h-screen">
             <aside className="w-1/4 p-4 border-r border-gray-300">
-                <h2 className="text-xl font-bold mb-4">Available Node Types</h2>
+                <h2 className="text-xl font-bold mb-4">Блоки для базы знаний</h2>
                 <ul>
                     {Object.keys(nodeTypes).map((key) => (
                         <li
