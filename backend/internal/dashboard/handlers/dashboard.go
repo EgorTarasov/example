@@ -42,13 +42,13 @@ func initApi(api fiber.Router, h Handler) error {
 
 	eachPipeline := pipeline.Group("/:id")
 
-	eachPipeline.Get("/", middleware.RoleMiddleware(auth.Admin), h.GetPipelineById)
-	eachPipeline.Post("/widgetblock", h.CreateWidgetBlock)
-	eachPipeline.Post("/textsplitter", h.CreateTextSplitter)
-	eachPipeline.Post("/vectorstore", h.CreateVectorStore)
-	eachPipeline.Post("/llm", h.CreateLLMBlock)
-	eachPipeline.Post("/datablock", h.CreateDataBlock)
-	eachPipeline.Post("/inputblock", h.CreateInputBlock)
+	eachPipeline.Get("/", h.GetPipelineById)
+	eachPipeline.Post("/widgetblock", middleware.RoleMiddleware(auth.Admin), h.CreateWidgetBlock)
+	eachPipeline.Post("/textsplitter", middleware.RoleMiddleware(auth.Admin), h.CreateTextSplitter)
+	eachPipeline.Post("/vectorstore", middleware.RoleMiddleware(auth.Admin), h.CreateVectorStore)
+	eachPipeline.Post("/llm", middleware.RoleMiddleware(auth.Admin), h.CreateLLMBlock)
+	eachPipeline.Post("/datablock", middleware.RoleMiddleware(auth.Admin), h.CreateDataBlock)
+	eachPipeline.Post("/inputblock", middleware.RoleMiddleware(auth.Admin), h.CreateInputBlock)
 
 	return nil
 }
