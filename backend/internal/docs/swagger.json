@@ -117,18 +117,72 @@
                     }
                 }
             }
+        },
+        "/api/dashboard/pipelines": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new pipeline for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipelines"
+                ],
+                "summary": "Create a new pipeline",
+                "parameters": [
+                    {
+                        "description": "Create Pipeline Payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreatePipeLine"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "id",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "auth.UserRole": {
             "type": "string",
             "enum": [
-                "doctor",
-                "patient"
+                "admin",
+                "customer"
             ],
             "x-enum-varnames": [
-                "Doctor",
-                "Patient"
+                "Admin",
+                "Customer"
             ]
         },
         "handlers.emailLoginPayload": {
@@ -161,6 +215,20 @@
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "models.CreatePipeLine": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

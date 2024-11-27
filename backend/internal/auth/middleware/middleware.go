@@ -26,10 +26,8 @@ func RoleMiddleware(requiredRole auth.UserRole) fiber.Handler {
 			})
 		}
 
-		// Store userData in the context's local storage
 		c.Locals("userData", userData)
 
-		// Continue to the next handler
 		return c.Next()
 	}
 }
