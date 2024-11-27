@@ -46,7 +46,9 @@ type PipeLine struct {
 }
 
 type CreateInputBlock struct {
-	PipeLineID int64 `json:"pipeline_id"`
+	PipeLineID  int64 `json:"pipeline_id"`
+	DataBlockId int64 `json:"data_block_id"`
+	LlmId       int64 `json:"llm_id"`
 }
 
 type InputBlockDto struct {
@@ -59,8 +61,11 @@ type InputBlockDto struct {
 }
 
 type CreateDataBlock struct {
-	Type string `json:"type"` // txt,pdf, notion, confluence
-	Url  string `json:"url"`
+	InputBlockId   int64  `json:"input_block_id"`
+	Type           string `json:"type"` // txt,pdf, notion, confluence
+	Url            string `json:"url"`
+	TextSplitterId int64  `json:"text_splitter_id"`
+	VectorStoreId  int64  `json:"vector_store_id"`
 }
 
 type DataBlockDto struct {
@@ -72,8 +77,9 @@ type DataBlockDto struct {
 }
 
 type CreateTextSplitter struct {
-	Type   string      `json:"type"` // regex, split
-	Config interface{} `json:"config"`
+	DataBlockID int64       `json:"data_block_id"`
+	Type        string      `json:"type"` // regex, split
+	Config      interface{} `json:"config"`
 }
 type TextSplitterDto struct {
 	Id          int64       `json:"id"`
@@ -83,8 +89,10 @@ type TextSplitterDto struct {
 }
 
 type CreateVectorStore struct {
-	Type           string `json:"type"` // clichouse, pgvector
-	CollectionName string `json:"collection_name"`
+	DataBlockID      int64  `json:"data_block_id"`
+	Type             string `json:"type"` // clichouse, pgvector
+	CollectionName   string `json:"collection_name"`
+	PersistDirectory string `json:"persist_directory"`
 }
 
 type VectorStoreDto struct {
@@ -93,6 +101,7 @@ type VectorStoreDto struct {
 	CollectionName string `json:"collection_name"`
 }
 type CreateWidgetBlock struct {
+	LlmId    int64       `json:"llm_id"`
 	ImageUrl string      `json:"image_url"`
 	Styles   interface{} `json:"styles"`
 }
@@ -104,12 +113,13 @@ type WidgetBlockDto struct {
 }
 
 type CreateLLMBlock struct {
+	InputBlockId  int64  `json:"input_block_id"`
 	Type          string `json:"type"`
 	Endpoint      string `json:"endpoint"`
 	Model         string `json:"model"`
 	Prompt        string `json:"prompt"`
 	Template      string `json:"template"`
-	WidgetBlockID int64  `json:"widget_block_id"`
+	WidgetBlockId int64  `json:"widget_block_id"`
 }
 
 type LLMDto struct {

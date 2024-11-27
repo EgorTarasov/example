@@ -14,7 +14,7 @@
         },
         "version": "1.0"
     },
-    "host": "larek.tech",
+    "host": "localhost:9999",
     "basePath": "/",
     "paths": {
         "/api/auth/login": {
@@ -163,6 +163,60 @@
                 }
             }
         },
+        "/api/dashboard/inputblock": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new input block for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipelines"
+                ],
+                "summary": "Create a new input block",
+                "parameters": [
+                    {
+                        "description": "Create Input Block Payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateInputBlock"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "id",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/dashboard/pipeline": {
             "post": {
                 "security": [
@@ -260,6 +314,20 @@
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "models.CreateInputBlock": {
+            "type": "object",
+            "properties": {
+                "data_block_id": {
+                    "type": "integer"
+                },
+                "llm_id": {
+                    "type": "integer"
+                },
+                "pipeline_id": {
+                    "type": "integer"
                 }
             }
         },

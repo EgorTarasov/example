@@ -14,13 +14,13 @@ type service struct {
 type Service interface {
 	CreatePipeline(ctx context.Context, payload models.CreatePipeLine) (int64, error)
 	GetDashboardById(ctx context.Context, id int64) ([]models.PipeLineDashboardDto, error)
-
-	// CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error)
-	// CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error)
-	// CreateWidgetBlock(ctx context.Context, payload models.CreateWidgetBlock) (int64, error)
-	// CreateTextSplitter(ctx context.Context, payload models.CreateTextSplitter) (int64, error)
-	// CreateVectorStore(ctx context.Context, payload models.CreateVectorStore) (int64, error)
-	// CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock) (int64, error)
+	GetPipelineById(ctx context.Context, id int64) (models.PipeLineDto, error)
+	CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error)
+	CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error)
+	CreateWidgetBlock(ctx context.Context, payload models.CreateWidgetBlock) (int64, error)
+	CreateTextSplitter(ctx context.Context, payload models.CreateTextSplitter) (int64, error)
+	CreateVectorStore(ctx context.Context, payload models.CreateVectorStore) (int64, error)
+	CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock) (int64, error)
 }
 
 func New(graphRepo repo.GraphRepo) Service {
@@ -37,28 +37,28 @@ func (s *service) GetDashboardById(ctx context.Context, id int64) ([]models.Pipe
 	return s.graph.GetDashboardById(ctx, id)
 }
 
-// func (s *service) GetPipelineById(ctx context.Context, id int64) (models.PipeLineDto, error) {
-// 	return
-// }
+func (s *service) GetPipelineById(ctx context.Context, id int64) (models.PipeLineDto, error) {
+	return s.graph.GetPipelineById(ctx, id)
+}
 
-// func (s *service) CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error) {
-// 	return s.graph.CreateDataBlock(ctx, payload)
-// }
+func (s *service) CreateDataBlock(ctx context.Context, payload models.CreateDataBlock) (int64, error) {
+	return s.graph.CreateDataBlock(ctx, payload)
+}
 
-// func (s *service) CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error) {
-// 	return s.graph.CreateInputBlock(ctx, payload)
-// }
-// func (s *service) CreateWidgetBlock(ctx context.Context, payload models.CreateWidgetBlock) (int64, error) {
-// 	return s.graph.CreateWidgetBlock(ctx, payload)
-// }
-// func (s *service) CreateTextSplitter(ctx context.Context, payload models.CreateTextSplitter) (int64, error) {
-// 	return s.graph.CreateTextSplitter(ctx, payload)
-// }
+func (s *service) CreateInputBlock(ctx context.Context, payload models.CreateInputBlock) (int64, error) {
+	return s.graph.CreateInputBlock(ctx, payload)
+}
+func (s *service) CreateWidgetBlock(ctx context.Context, payload models.CreateWidgetBlock) (int64, error) {
+	return s.graph.CreateWidgetBlock(ctx, payload)
+}
+func (s *service) CreateTextSplitter(ctx context.Context, payload models.CreateTextSplitter) (int64, error) {
+	return s.graph.CreateTextSplitter(ctx, payload)
+}
 
-// func (s *service) CreateVectorStore(ctx context.Context, payload models.CreateVectorStore) (int64, error) {
-// 	return s.graph.CreateVectorStore(ctx, payload)
-// }
+func (s *service) CreateVectorStore(ctx context.Context, payload models.CreateVectorStore) (int64, error) {
+	return s.graph.CreateVectorStore(ctx, payload)
+}
 
-// func (s *service) CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock) (int64, error) {
-// 	return s.graph.CreateLLMBlock(ctx, payload)
-// }
+func (s *service) CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock) (int64, error) {
+	return s.graph.CreateLLMBlock(ctx, payload)
+}

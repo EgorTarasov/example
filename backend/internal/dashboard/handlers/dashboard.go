@@ -14,13 +14,13 @@ type handler struct {
 type Handler interface {
 	CreatePipeline(*fiber.Ctx) error
 	GetDashboardById(*fiber.Ctx) error
-	// CreateInputBlock(*fiber.Ctx) error
-	// CreateDataBlock(*fiber.Ctx) error
-	// CreateWidgetBlock(*fiber.Ctx) error
-	// CreateTextSplitter(*fiber.Ctx) error
-	// CreateVectorStore(*fiber.Ctx) error
-	// CreatePipeLine(*fiber.Ctx) error
-	// CreateLLMBlock(*fiber.Ctx) error
+	GetPipelineById(*fiber.Ctx) error
+	CreateInputBlock(*fiber.Ctx) error
+	CreateDataBlock(*fiber.Ctx) error
+	CreateWidgetBlock(*fiber.Ctx) error
+	CreateTextSplitter(*fiber.Ctx) error
+	CreateVectorStore(*fiber.Ctx) error
+	CreateLLMBlock(*fiber.Ctx) error
 }
 
 func NewHandler(s service.Service) Handler {
@@ -34,14 +34,15 @@ func InitRoutes(api fiber.Router, view fiber.Router, h Handler) error {
 
 func initApi(api fiber.Router, h Handler) error {
 	dashboard := api.Group("/dashboard")
-	// dashboard.Post("/datablock", h.CreateDataBlock)
-	// dashboard.Post("/inputblock", h.CreateInputBlock)
+	dashboard.Post("/datablock", h.CreateDataBlock)
+	dashboard.Post("/inputblock", h.CreateInputBlock)
 	dashboard.Post("/pipeline", middleware.RoleMiddleware(auth.Admin), h.CreatePipeline)
 	dashboard.Get("/", middleware.RoleMiddleware(auth.Admin), h.GetDashboardById)
-	// dashboard.Get("/pipeline/:id", middleware.RoleMiddleware(auth.Admin), h.GetPipelineById)
-	// dashboard.Post("/widgetblock", h.CreateWidgetBlock)
-	// dashboard.Post("/textsplitterblock", h.CreateTextSplitter)
-	// dashboard.Post("/vectorstoreblock", h.CreateVectorStore)
+	dashboard.Get("/pipeline/:id", middleware.RoleMiddleware(auth.Admin), h.GetPipelineById)
+	dashboard.Post("/widgetblock", h.CreateWidgetBlock)
+	dashboard.Post("/textsplitter", h.CreateTextSplitter)
+	dashboard.Post("/vectorstore", h.CreateVectorStore)
+	dashboard.Post("/llm", h.CreateLLMBlock)
 
 	return nil
 }
