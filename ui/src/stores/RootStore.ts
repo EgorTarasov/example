@@ -2,6 +2,7 @@ import { makeAutoObservable } from "mobx";
 import apiService from "@/api/ApiService.ts";
 import { LoginInfo, LoginResponse } from "@/api/models/auth.ts";
 import { RegisterInfo } from "@/api/models/register.ts";
+import { CreatePipeLine } from "@/api/models/models";
 
 
 
@@ -47,12 +48,12 @@ export class RootStore {
         this.token = null
     }
 
-    async createPipeline() {
+    async createPipeline(pipelineInfo: CreatePipeLine) {
 
         console.log('Creating pipeline');
         const response = await apiService.createPipeLine({
-            name: 'New pipeline',
-            description: 'New pipeline description'
+            title: pipelineInfo.title,
+            description: pipelineInfo.description,
         });
         this.currentPipelineId = response.id;
         console.log('Created pipeline with id ' + response.id);

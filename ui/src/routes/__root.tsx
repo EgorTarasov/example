@@ -1,7 +1,7 @@
 import NotFoundPage from '@/pages/NotFoundPage'
 import { createRootRouteWithContext, Outlet} from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-import {AuthContext} from "../../hooks/useAuth.tsx";
+import { AuthContext } from '@/hooks/useAuth';
 
 
 type RouterContext = {

@@ -11,6 +11,8 @@ export const isValidConnection = (connection: Connection | Edge): boolean => {
     // { source: '1732699979453', sourceHandle: 'inputBlock|1732699979453|source', target: '1732699246918', targetHandle: 'llm|1732699246918|target' }
     return (
         (sourceNodeType === 'inputBlock' && targetNodeType === 'dataBlock') ||
-        (sourceNodeType === 'inputBlock' && targetNodeType === 'llm')
+        (sourceNodeType === 'inputBlock' && targetNodeType === 'llm') ||
+        (sourceNodeType === 'dataBlock' && targetNodeType === 'textSplitter') ||
+        (sourceNodeType === 'dataBlock' && targetNodeType === 'vectorStore')
     );
 };

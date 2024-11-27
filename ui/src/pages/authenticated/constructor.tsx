@@ -14,7 +14,9 @@ import { memo, useCallback, useState, useEffect } from "react";
 import { EdgeInfo, NodeInfo } from "@/models/nodeInfo.ts";
 import { nodeTypes } from '@/components/nodes/nodeTypes';
 import { createNode } from '@/components/nodes/nodeFactory';
-import { Route, useParams } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "@tanstack/react-router";
+// import { Route, useParams } from "@tanstack/react-router";
 
 const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
 
@@ -26,12 +28,12 @@ const initialNodes: NodeInfo[] = [
 const initialEdges: EdgeInfo[] = [];
 
 const onNodeDrag: OnNodeDrag = (_, node) => {
-    // console.log('drag event', node.data);
+    console.log('drag event', node.data);
 };
 
 const Constructor = memo(function Constructor() {
 
-    const { pipelineId } = useParams({ strict: false });
+    // const { pipelineId } = useParams({ strict: false });
     // console.log('pipelineId', pipelineId);
 
     const [nodes, setNodes] = useState<Node[]>(initialNodes);
@@ -96,16 +98,26 @@ const Constructor = memo(function Constructor() {
         event.dataTransfer.dropEffect = 'move';
     };
 
+  
+    const navigate = useNavigate();
+    function handleButtonClick(): void {
+        // alert("Button clicked!");
+        navigate({
+            to: '/dashboard', 
+        });
+    }
     return (
+    
 
         <main className="flex gap-4 p-4 h-screen">
             <aside className="w-1/4 p-4 border-r border-gray-300">
                 <h2 className="text-xl font-bold mb-4">Блоки для базы знаний</h2>
+                
                 <ul>
                     {Object.keys(nodeTypes).map((key) => (
                         <li
                             key={key}
-                            className="mb-2 cursor-pointer"
+                            className="m-1 p-2 border rounded cursor-pointer"
                             onDragStart={(event) => onDragStart(event, key)}
                             draggable
                         >
@@ -115,7 +127,11 @@ const Constructor = memo(function Constructor() {
                 </ul>
             </aside>
             <div className="flex-1 flex flex-col h-full">
-                <h1 className="mb-4 text-2xl font-bold">Конструктор</h1>
+            <div className="flex justify-between items-center align-center mb-4">
+                    <h1 className="text-2xl font-semibold">Конструктор</h1>
+                    <Button onClick={handleButtonClick}>Назад</Button>
+                </div>
+                
                 <div
                     className="flex-1"
                     style={{ border: '2px solid #000' }}

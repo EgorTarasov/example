@@ -5,6 +5,9 @@ import InputBlockNodeType from "./InputBlockNode";
 import DataBlockNode from "./DataBlockNode";
 import ColorSelectorNode from "./ColorSelectorNode";
 import LLMNode from "./LLMNode";
+import TextSplitterNodeType from "./TextSplitterNode";
+import VectorStoreNodeType from "./VectorStoreNode";
+import { ChatBotWidget } from "../chat-bot-widget";
 
 
 export const nodeTypes: NodeTypes = {
@@ -12,4 +15,7 @@ export const nodeTypes: NodeTypes = {
     dataBlock: DataBlockNode,
     selectorNode: ColorSelectorNode,
     llm: LLMNode,
+    textSplitter: TextSplitterNodeType,
+    vectorStore: VectorStoreNodeType,
+    widget: ChatBotWidget,
 };

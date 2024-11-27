@@ -1,40 +1,92 @@
 import { memo, useState } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
 import { LLMDto } from '@/api/models/models';
 import { isValidConnection } from './utils';
-import ollama from 'ollama';
+// import ollama from 'ollama';
+import axios from 'axios';
 
 export type LLMNodeType = Node<{
     dto: LLMDto;
 }, 'llm'>;
 
+
 const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
     const [type, setType] = useState(data.dto.type);
-    const [endpoint, setEndpoint] = useState(data.dto.endpoint);
-    const [prompt, setPrompt] = useState('');
+    const [endpoint, setEndpoint] = useState("http://10.0.1.70:7869/api/generate");
+    const [prompt, setPrompt] = useState('Привет! Ты цифровой ассистент?');
+    const [template] = useState('');
+
     const [response, setResponse] = useState('');
+    const [loading, setLoading] = useState(false); 
 
     const typeOptions = [
         { value: 'mistral', label: 'mistral 7b' },
-        { value: 'llama3.1', label: 'llama3.1 8b' },
-        { value: 'llama3.2:3b', label: 'llama3.2 3b' },
-        { value: 'custom', label: 'custom' }
+        { value: 'gemma:7b-instruct-q3_K_S', label: 'gemma' },
+        { value: 'llama3.2', label: 'llama3.2 3b' },
     ];
+//7869
+    // const handleTestConnection = async () => {
+    //     try {
+    //         const message = { role: 'user', content: prompt };
+    //         const responseStream = await ollama.chat({ model: type, messages: [message], stream: true });
+    //         let fullResponse = '';
+    //         for await (const part of responseStream) {
+    //             fullResponse += part.message.content;
+    //         }
+    //         setResponse(fullResponse);
+    //     } catch (error) {
+    //         console.error('Error testing connection:', error);
+    //         setResponse('Error testing connection');
+    //     }
+    // };
+    // const handleTestConnection = async () => {
+    //     try {
+    //         const payload = {
+    //             model: type,
+    //             prompt: prompt,
+    //         };
 
+    //         const config = {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //         };
+
+    //         // Make an HTTP POST request to the Ollama API
+    //         const response = await axios.post(endpoint, payload, config);
+
+    //         // Assuming the API returns a JSON response with a 'reply' field
+    //         setResponse(response.data.reply);
+    //     } catch (error) {
+    //         console.error('Error testing connection:', error);
+    //         setResponse('Error testing connection');
+    //     }
+    // };
+
+    //3 try
+    
     const handleTestConnection = async () => {
+        setLoading(true);
         try {
-            const message = { role: 'user', content: prompt };
-            const responseStream = await ollama.chat({ model: type, messages: [message], stream: true });
-            let fullResponse = '';
-            for await (const part of responseStream) {
-                fullResponse += part.message.content;
-            }
-            setResponse(fullResponse);
+            const payload = {
+                model: type, // Use selected model from state
+                prompt: prompt,
+            };
+
+            console.log("i've tried(")
+            console.log(`endpoint ${endpoint} \n payload \n ${payload.model} \n ${payload.prompt}`)
+            // Make an HTTP POST request to the Ollama API
+            const res = await axios.post<{ reply: string }>(endpoint, payload, {});
+
+            // Assuming the API returns a JSON response with a 'reply' field
+            setResponse(res.data.reply);
         } catch (error) {
             console.error('Error testing connection:', error);
             setResponse('Error testing connection');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -63,7 +115,7 @@ const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {typeOptions.map(option => (
-                                        <SelectItem key={option.value} value={option.value}>
+                                        <SelectItem key={option.value} value={option.value} className='border m-2 rounded'>
                                             {option.label}
                                         </SelectItem>
                                     ))}
@@ -77,12 +129,24 @@ const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
                                 placeholder="Enter Endpoint"
                             />
                             <Input
-                                className="nodrag"
-                                type="text"
+                                className='nodrag'
+                                type='text' 
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
-                                placeholder="Enter Test Prompt"
+                                placeholder={`Enter Prompt (exmaple: ${prompt})`}
+                            
                             />
+                            <div className='ont-bold text-sm border-t pb-2'>
+                                    <strong>Template:</strong>
+                                    {template ? (
+                                        <p className='border-l'>&#123; context &#123; {template}</p>
+                                        ):
+                                        (
+                                            <p className='border-l'>No Template</p>
+
+                                        )}
+                                    
+                            </div>
                             <button
                                 className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
                                 onClick={handleTestConnection}
