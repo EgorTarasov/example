@@ -145,49 +145,60 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	// inputs and edges for data blocks and llms
 	for _, i := range p.InputBlocks {
 		nodes = append(nodes, i)
-		edges = append(edges, Edge{
-			Id:           strconv.FormatInt(i.Id, 10) + "-" + strconv.FormatInt(i.DataBlockID, 10),
-			Source:       strconv.FormatInt(i.Id, 10),
-			Target:       strconv.FormatInt(i.DataBlockID, 10),
-			SourceHandle: "inputBlock|" + strconv.FormatInt(i.Id, 10) + "|source",
-			TargetHandle: "dataBlock|" + strconv.FormatInt(i.DataBlockID, 10) + "|target",
-		})
-		edges = append(edges, Edge{
-			Id:           strconv.FormatInt(i.Id, 10) + "-" + strconv.FormatInt(i.LLMID, 10),
-			Source:       strconv.FormatInt(i.Id, 10),
-			Target:       strconv.FormatInt(i.LLMID, 10),
-			SourceHandle: "inputBlock|" + strconv.FormatInt(i.Id, 10) + "|source",
-			TargetHandle: "llm|" + strconv.FormatInt(i.LLMID, 10) + "|target",
-		})
+		if i.DataBlockID != 0 {
+			edges = append(edges, Edge{
+				Id:           strconv.FormatInt(i.Id, 10) + "-" + strconv.FormatInt(i.DataBlockID, 10),
+				Source:       strconv.FormatInt(i.Id, 10),
+				Target:       strconv.FormatInt(i.DataBlockID, 10),
+				SourceHandle: "inputBlock|" + strconv.FormatInt(i.Id, 10) + "|source",
+				TargetHandle: "dataBlock|" + strconv.FormatInt(i.DataBlockID, 10) + "|target",
+			})
+		}
+		if i.LLMID != 0 {
+			edges = append(edges, Edge{
+				Id:           strconv.FormatInt(i.Id, 10) + "-" + strconv.FormatInt(i.LLMID, 10),
+				Source:       strconv.FormatInt(i.Id, 10),
+				Target:       strconv.FormatInt(i.LLMID, 10),
+				SourceHandle: "inputBlock|" + strconv.FormatInt(i.Id, 10) + "|source",
+				TargetHandle: "llm|" + strconv.FormatInt(i.LLMID, 10) + "|target",
+			})
+		}
 	}
 	// llms and edges for widgets
 	for _, llm := range p.LLMs {
 		nodes = append(nodes, llm)
-		edges = append(edges, Edge{
-			Id:           strconv.FormatInt(llm.Id, 10) + "-" + strconv.FormatInt(llm.WidgetBlockID, 10),
-			Source:       strconv.FormatInt(llm.Id, 10),
-			Target:       strconv.FormatInt(llm.WidgetBlockID, 10),
-			SourceHandle: "llm|" + strconv.FormatInt(llm.Id, 10) + "|source",
-			TargetHandle: "widget|" + strconv.FormatInt(llm.WidgetBlockID, 10) + "|target",
-		})
+		if llm.WidgetBlockID != 0 {
+			edges = append(edges, Edge{
+				Id:           strconv.FormatInt(llm.Id, 10) + "-" + strconv.FormatInt(llm.WidgetBlockID, 10),
+				Source:       strconv.FormatInt(llm.Id, 10),
+				Target:       strconv.FormatInt(llm.WidgetBlockID, 10),
+				SourceHandle: "llm|" + strconv.FormatInt(llm.Id, 10) + "|source",
+				TargetHandle: "widget|" + strconv.FormatInt(llm.WidgetBlockID, 10) + "|target",
+			})
+		}
 	}
 
 	for _, data := range p.DataBlocks {
 		nodes = append(nodes, data)
-		edges = append(edges, Edge{
-			Id:           strconv.FormatInt(data.Id, 10) + "-" + strconv.FormatInt(data.TextSplitterID, 10),
-			Source:       strconv.FormatInt(data.Id, 10),
-			Target:       strconv.FormatInt(data.TextSplitterID, 10),
-			SourceHandle: "dataBlock|" + strconv.FormatInt(data.Id, 10) + "|source",
-			TargetHandle: "textSplitter|" + strconv.FormatInt(data.TextSplitterID, 10) + "|target",
-		})
-		edges = append(edges, Edge{
-			Id:           strconv.FormatInt(data.Id, 10) + "-" + strconv.FormatInt(data.VectorStoreID, 10),
-			Source:       strconv.FormatInt(data.Id, 10),
-			Target:       strconv.FormatInt(data.VectorStoreID, 10),
-			SourceHandle: "dataBlock|" + strconv.FormatInt(data.Id, 10) + "|source",
-			TargetHandle: "vectorStore|" + strconv.FormatInt(data.VectorStoreID, 10) + "|target",
-		})
+		if data.TextSplitterID != 0 {
+
+			edges = append(edges, Edge{
+				Id:           strconv.FormatInt(data.Id, 10) + "-" + strconv.FormatInt(data.TextSplitterID, 10),
+				Source:       strconv.FormatInt(data.Id, 10),
+				Target:       strconv.FormatInt(data.TextSplitterID, 10),
+				SourceHandle: "dataBlock|" + strconv.FormatInt(data.Id, 10) + "|source",
+				TargetHandle: "textSplitter|" + strconv.FormatInt(data.TextSplitterID, 10) + "|target",
+			})
+		}
+		if data.VectorStoreID != 0 {
+			edges = append(edges, Edge{
+				Id:           strconv.FormatInt(data.Id, 10) + "-" + strconv.FormatInt(data.VectorStoreID, 10),
+				Source:       strconv.FormatInt(data.Id, 10),
+				Target:       strconv.FormatInt(data.VectorStoreID, 10),
+				SourceHandle: "dataBlock|" + strconv.FormatInt(data.Id, 10) + "|source",
+				TargetHandle: "vectorStore|" + strconv.FormatInt(data.VectorStoreID, 10) + "|target",
+			})
+		}
 	}
 
 	for _, splitter := range p.TextSplitters {
