@@ -6,7 +6,7 @@ server:
     - http://localhost:5173
 
 pg:
-  dsn: postgresql://pg-user:pg-password@127.0.0.1:5432/t1-dev
+  dsn: postgresql://pg-user:pg-password@10.0.1.70:5432/t1-dev
 
 dashboard:
   telegram_link: https://t.me/dino_misis_bot?start=
