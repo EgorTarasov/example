@@ -12,15 +12,24 @@ type handler struct {
 }
 
 type Handler interface {
-	CreatePipeline(*fiber.Ctx) error
 	GetDashboardById(*fiber.Ctx) error
+
+	CreatePipeline(*fiber.Ctx) error
 	GetPipelineById(*fiber.Ctx) error
+
 	CreateInputBlock(*fiber.Ctx) error
 	CreateDataBlock(*fiber.Ctx) error
 	CreateWidgetBlock(*fiber.Ctx) error
 	CreateTextSplitter(*fiber.Ctx) error
 	CreateVectorStore(*fiber.Ctx) error
 	CreateLLMBlock(*fiber.Ctx) error
+
+	DeleteInputBlock(*fiber.Ctx) error
+	DeleteDataBlock(*fiber.Ctx) error
+	DeleteWidgetBlock(*fiber.Ctx) error
+	DeleteTextSplitter(*fiber.Ctx) error
+	DeleteVectorStore(*fiber.Ctx) error
+	DeleteLLMBlock(*fiber.Ctx) error
 }
 
 func NewHandler(s service.Service) Handler {
@@ -38,6 +47,7 @@ func initApi(api fiber.Router, h Handler) error {
 
 	pipeline := dashboard.Group("/pipeline")
 	pipeline.Post("/", middleware.RoleMiddleware(auth.Admin), h.CreatePipeline)
+	pipeline.Delete("/", middleware.RoleMiddleware(auth.Admin), h.CreatePipeline)
 
 	eachPipeline := pipeline.Group("/:id")
 
@@ -48,6 +58,20 @@ func initApi(api fiber.Router, h Handler) error {
 	eachPipeline.Post("/llm", middleware.RoleMiddleware(auth.Admin), h.CreateLLMBlock)
 	eachPipeline.Post("/datablock", middleware.RoleMiddleware(auth.Admin), h.CreateDataBlock)
 	eachPipeline.Post("/inputblock", middleware.RoleMiddleware(auth.Admin), h.CreateInputBlock)
+
+	eachPipeline.Delete("/widgetblock/:id", middleware.RoleMiddleware(auth.Admin), h.DeleteWidgetBlock)
+	eachPipeline.Delete("/textsplitter/:id", middleware.RoleMiddleware(auth.Admin), h.DeleteTextSplitter)
+	eachPipeline.Delete("/vectorstore/:id", middleware.RoleMiddleware(auth.Admin), h.DeleteVectorStore)
+	eachPipeline.Delete("/llm/:id", middleware.RoleMiddleware(auth.Admin), h.DeleteLLMBlock)
+	eachPipeline.Delete("/datablock/:id", middleware.RoleMiddleware(auth.Admin), h.DeleteDataBlock)
+	eachPipeline.Delete("/inputblock/:id", middleware.RoleMiddleware(auth.Admin), h.DeleteInputBlock)
+
+	// eachPipeline.Put("/widgetblock", middleware.RoleMiddleware(auth.Admin), h.PutWidgetBlock)
+	// eachPipeline.Put("/textsplitter", middleware.RoleMiddleware(auth.Admin), h.PutTextSplitter)
+	// eachPipeline.Put("/vectorstore", middleware.RoleMiddleware(auth.Admin), h.PutVectorStore)
+	// eachPipeline.Put("/llm", middleware.RoleMiddleware(auth.Admin), h.PutLLMBlock)
+	// eachPipeline.Put("/datablock", middleware.RoleMiddleware(auth.Admin), h.PutDataBlock)
+	// eachPipeline.Put("/inputblock", middleware.RoleMiddleware(auth.Admin), h.PutInputBlock)
 
 	return nil
 }

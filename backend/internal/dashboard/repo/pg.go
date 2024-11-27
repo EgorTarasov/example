@@ -287,3 +287,51 @@ func (pg *pg) CreateLLMBlock(ctx context.Context, payload models.CreateLLMBlock)
 	}
 	return int64(newLlmBlock.ID), nil
 }
+
+func (pg *pg) DeleteInputBlock(ctx context.Context, id int64) error {
+	err := pg.Queries.DeleteInputBloc(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) DeleteDataBlock(ctx context.Context, id int64) error {
+	err := pg.Queries.DeleteDataBlock(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) DeleteWidgetBlock(ctx context.Context, id int64) error {
+	err := pg.Queries.DeleteWidgetBlock(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) DeleteTextSplitter(ctx context.Context, id int64) error {
+	err := pg.Queries.DeleteTextSplitter(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) DeleteLLMBlock(ctx context.Context, id int64) error {
+	err := pg.Queries.DeleteLlmBlock(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) DeleteVectorStore(ctx context.Context, id int64) error {
+	err := pg.Queries.DeleteVectorStore(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+	return nil
+}

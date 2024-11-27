@@ -363,6 +363,76 @@ func (q *Queries) CreateWidgetBlock(ctx context.Context, arg CreateWidgetBlockPa
 	return i, err
 }
 
+const deleteDataBlock = `-- name: DeleteDataBlock :exec
+DELETE FROM data_blocks
+WHERE id=$1
+`
+
+func (q *Queries) DeleteDataBlock(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteDataBlock, id)
+	return err
+}
+
+const deleteInputBloc = `-- name: DeleteInputBloc :exec
+DELETE FROM input_blocks
+WHERE id=$1
+`
+
+func (q *Queries) DeleteInputBloc(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteInputBloc, id)
+	return err
+}
+
+const deleteLlmBlock = `-- name: DeleteLlmBlock :exec
+DELETE FROM llm_blocks
+WHERE id=$1
+`
+
+func (q *Queries) DeleteLlmBlock(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteLlmBlock, id)
+	return err
+}
+
+const deletePipeLine = `-- name: DeletePipeLine :exec
+DELETE FROM pipelines
+WHERE id=$1
+`
+
+func (q *Queries) DeletePipeLine(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deletePipeLine, id)
+	return err
+}
+
+const deleteTextSplitter = `-- name: DeleteTextSplitter :exec
+DELETE FROM text_splitters
+WHERE id=$1
+`
+
+func (q *Queries) DeleteTextSplitter(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteTextSplitter, id)
+	return err
+}
+
+const deleteVectorStore = `-- name: DeleteVectorStore :exec
+DELETE FROM vector_stores
+WHERE id=$1
+`
+
+func (q *Queries) DeleteVectorStore(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteVectorStore, id)
+	return err
+}
+
+const deleteWidgetBlock = `-- name: DeleteWidgetBlock :exec
+DELETE FROM widget_blocks
+WHERE id=$1
+`
+
+func (q *Queries) DeleteWidgetBlock(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteWidgetBlock, id)
+	return err
+}
+
 const getDashboardById = `-- name: GetDashboardById :many
 SELECT id, user_id, title, pipeline_description, created_at, updated_at, deleted_at from pipelines
 WHERE user_id = $1
