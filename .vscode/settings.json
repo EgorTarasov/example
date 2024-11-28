@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "10.0.1.70",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "t1-dev",
+            "database": "t1-dev",
+            "username": "pg-user",
+            "password": "pg-password"
+        }
+    ]
+}

@@ -3,7 +3,7 @@ volumes:
 
 services:
   backend:
-    image: ghcr.io/egortarasov/example/backend:backend-4baa74c
+    image: ghcr.io/egortarasov/example/backend:backend-a2a79d3
     volumes:
       - ./config.yaml:/root/config.yaml
     command: ./main --config /root/config.yaml
@@ -13,6 +13,22 @@ services:
         condition: service_healthy
     ports:
       - "9999:9999"
+
+  pipeline:
+    image: ghcr.io/egortarasov/example/pipeline:latest
+    build:
+        context: ./rag
+        dockerfile: /rag.Dockerfile
+    command: fastapi run /app/src/api.py
+    ports:
+      - "8000:8000"
+    environment:
+    - POSTGRES_USER=${POSTGRES_USER:-pg-user}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pg-password}
+    - POSTGRES_DB=${POSTGRES_DB:-t1-dev}
+    - POSTGRES_HOST=${POSTGRES_HOST:-pg}
+    - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    - BACKEND_URL=http://backend:9999
 
   pg:
     image: pgvector/pgvector:pg17
@@ -56,3 +72,41 @@ services:
       - ${PWD}/fs/volumes/grafana/datasources:/etc/grafana/provisioning/datasources
     ports:
       - "3000:3000"
+
+  minio:
+   image: minio/minio:latest
+   command: server --console-address ":9001" /data/
+   ports:
+     - "9000:9000"
+     - "9001:9001"
+   environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-cisco}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_USER:-ciscocisco}
+   volumes:
+     - ./volumes/minio:/data
+     - ./minio/config.json:/root/.minio/config.json
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+     interval: 30s
+     timeout: 20s
+     retries: 3
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ./volumes/ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    ports:
+      - 7869:11434
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

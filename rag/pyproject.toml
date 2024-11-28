@@ -6,11 +6,24 @@ authors = ["EgorTarasov <61450170+EgorTarasov@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11.8"
+python = ">=3.11,<3.12"
 langchain-core = "^0.3.21"
 langchain-postgres = "^0.0.12"
 langchain-huggingface = "^0.1.2"
 fastapi = {extras = ["standard"], version = "^0.115.5"}
+minio = "^7.2.12"
+httpx = "^0.27.2"
+fitz = "^0.0.1.dev2"
+pymupdf = "^1.24.14"
+langchain-text-splitters = "^0.3.2"
+langchain-ollama = "^0.2.0"
+tiktoken = "^0.8.0"
+langchain = "^0.3.8"
+pydantic = "^2.10.2"
+psycopg = {extras = ["binary", "pool"], version = "^3.2.3"}
+python-dotenv = "^1.0.1"
+greenlet = "^3.1.1"
+jinja2 = "^3.1.4"
 
 
 [build-system]
