@@ -239,7 +239,7 @@ func (h *handler) CreateLLMBlock(c *fiber.Ctx) error {
 }
 
 func (h *handler) DeleteInputBlock(c *fiber.Ctx) error {
-	idStr := c.Params("id")
+	idStr := c.Params("block_id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
@@ -254,7 +254,7 @@ func (h *handler) DeleteInputBlock(c *fiber.Ctx) error {
 }
 
 func (h *handler) DeleteDataBlock(c *fiber.Ctx) error {
-	idStr := c.Params("id")
+	idStr := c.Params("block_id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
@@ -269,7 +269,7 @@ func (h *handler) DeleteDataBlock(c *fiber.Ctx) error {
 }
 
 func (h *handler) DeleteWidgetBlock(c *fiber.Ctx) error {
-	idStr := c.Params("id")
+	idStr := c.Params("block_id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
@@ -284,7 +284,7 @@ func (h *handler) DeleteWidgetBlock(c *fiber.Ctx) error {
 }
 
 func (h *handler) DeleteTextSplitter(c *fiber.Ctx) error {
-	idStr := c.Params("id")
+	idStr := c.Params("block_id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
@@ -299,7 +299,7 @@ func (h *handler) DeleteTextSplitter(c *fiber.Ctx) error {
 }
 
 func (h *handler) DeleteVectorStore(c *fiber.Ctx) error {
-	idStr := c.Params("id")
+	idStr := c.Params("block_id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
@@ -314,7 +314,7 @@ func (h *handler) DeleteVectorStore(c *fiber.Ctx) error {
 }
 
 func (h *handler) DeleteLLMBlock(c *fiber.Ctx) error {
-	idStr := c.Params("id")
+	idStr := c.Params("block_id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
@@ -325,5 +325,161 @@ func (h *handler) DeleteLLMBlock(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	return nil
+}
+
+func (h *handler) UpdateInputBlock(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+	var payload models.CreateInputBlock
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
+	}
+
+	payload.PipeLineID = id
+
+	idBlockStr := c.Params("block_id")
+	idBlock, err := strconv.ParseInt(idBlockStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+
+	err = h.s.UpdateInputBlock(c.Context(), idBlock, payload)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return nil
+}
+
+func (h *handler) UpdateDataBlock(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+	var payload models.CreateDataBlock
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
+	}
+
+	payload.PipeLineID = id
+
+	idBlockStr := c.Params("block_id")
+	idBlock, err := strconv.ParseInt(idBlockStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+
+	err = h.s.UpdateDataBlock(c.Context(), idBlock, payload)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return nil
+}
+
+func (h *handler) UpdateWidgetBlock(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+	var payload models.CreateWidgetBlock
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
+	}
+
+	payload.PipeLineID = id
+
+	idBlockStr := c.Params("block_id")
+	idBlock, err := strconv.ParseInt(idBlockStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+
+	err = h.s.UpdateWidgetBlock(c.Context(), idBlock, payload)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return nil
+}
+
+func (h *handler) UpdateLLMBlock(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+	var payload models.CreateLLMBlock
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
+	}
+
+	payload.PipeLineID = id
+
+	idBlockStr := c.Params("block_id")
+	idBlock, err := strconv.ParseInt(idBlockStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+
+	err = h.s.UpdateLLMBlock(c.Context(), idBlock, payload)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return nil
+}
+
+func (h *handler) UpdateTextSplitter(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+	var payload models.CreateTextSplitter
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
+	}
+
+	payload.PipeLineID = id
+
+	idBlockStr := c.Params("block_id")
+	idBlock, err := strconv.ParseInt(idBlockStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+
+	err = h.s.UpdateTextSplitter(c.Context(), idBlock, payload)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return nil
+}
+
+func (h *handler) UpdateVectorStore(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+	var payload models.CreateVectorStore
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
+	}
+
+	payload.PipeLineID = id
+
+	idBlockStr := c.Params("block_id")
+	idBlock, err := strconv.ParseInt(idBlockStr, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid id"})
+	}
+
+	err = h.s.UpdateVectorStore(c.Context(), idBlock, payload)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
 	return nil
 }

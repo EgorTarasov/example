@@ -335,3 +335,96 @@ func (pg *pg) DeleteVectorStore(ctx context.Context, id int64) error {
 	}
 	return nil
 }
+
+func (pg *pg) UpdateInputBlock(ctx context.Context, id int64, payload models.CreateInputBlock) error {
+	err := pg.Queries.UpdateInputBlock(ctx, db.UpdateInputBlockParams{
+		ID:          int32(id),
+		DataBlockID: payload.DataBlockId,
+		LlmID:       payload.LlmId,
+	})
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) UpdateDataBlock(ctx context.Context, id int64, payload models.CreateDataBlock) error {
+	err := pg.Queries.UpdateDataBlock(ctx, db.UpdateDataBlockParams{
+		InputBlockID:   IntToPgType(payload.InputBlockId),
+		StorageUrl:     payload.Url,
+		TextSplitterID: payload.TextSplitterId,
+		VectorStoreID:  payload.VectorStoreId,
+		ID:             int32(id),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) UpdateWidgetBlock(ctx context.Context, id int64, payload models.CreateWidgetBlock) error {
+	temp, err := json.Marshal(payload.Styles)
+	if err != nil {
+		return err
+	}
+
+	err = pg.Queries.UpdateWidgetBlock(ctx, db.UpdateWidgetBlockParams{
+		LlmBlockID: IntToPgType(payload.LlmId),
+		ImageUrl:   payload.ImageUrl,
+		Styles:     temp,
+		ID:         int32(id),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) UpdateTextSplitter(ctx context.Context, id int64, payload models.CreateTextSplitter) error {
+	temp, err := json.Marshal(payload.Config)
+	if err != nil {
+		return err
+	}
+	err = pg.Queries.UpdateTextSplitter(ctx, db.UpdateTextSplitterParams{
+		DataBlockID:  IntToPgType(payload.DataBlockID),
+		SplitterType: payload.Type,
+		Config:       string(temp),
+		ID:           int32(id),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) UpdateLLMBlock(ctx context.Context, id int64, payload models.CreateLLMBlock) error {
+	err := pg.Queries.UpdateLlmBlock(ctx, db.UpdateLlmBlockParams{
+		InputBlockID:  IntToPgType(payload.InputBlockId),
+		LlmType:       payload.Type,
+		Model:         payload.Model,
+		Prompt:        payload.Prompt,
+		LlmEndpoint:   payload.Endpoint,
+		Template:      payload.Template,
+		WidgetBlockID: payload.WidgetBlockId,
+		ID:            int32(id),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *pg) UpdateVectorStore(ctx context.Context, id int64, payload models.CreateVectorStore) error {
+	err := pg.Queries.UpdateVectorStore(ctx, db.UpdateVectorStoreParams{
+		DataBlockID:      IntToPgType(payload.DataBlockID),
+		StoreType:        payload.Type,
+		CollectionName:   payload.CollectionName,
+		PersistDirectory: payload.PersistDirectory,
+		ID:               int32(id),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

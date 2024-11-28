@@ -690,3 +690,164 @@ func (q *Queries) GetWidgetBlocksById(ctx context.Context, pipelineID pgtype.Int
 	}
 	return items, nil
 }
+
+const updateDataBlock = `-- name: UpdateDataBlock :exec
+UPDATE data_blocks
+SET input_block_id=$1, storage_url=$2, text_splitter_id=$3,vector_store_id=$4
+WHERE id=$5
+`
+
+type UpdateDataBlockParams struct {
+	InputBlockID   pgtype.Int8
+	StorageUrl     string
+	TextSplitterID int64
+	VectorStoreID  int64
+	ID             int32
+}
+
+func (q *Queries) UpdateDataBlock(ctx context.Context, arg UpdateDataBlockParams) error {
+	_, err := q.db.Exec(ctx, updateDataBlock,
+		arg.InputBlockID,
+		arg.StorageUrl,
+		arg.TextSplitterID,
+		arg.VectorStoreID,
+		arg.ID,
+	)
+	return err
+}
+
+const updateInputBlock = `-- name: UpdateInputBlock :exec
+UPDATE input_blocks
+SET data_block_id=$1, llm_id=$2
+WHERE id=$3
+`
+
+type UpdateInputBlockParams struct {
+	DataBlockID int64
+	LlmID       int64
+	ID          int32
+}
+
+func (q *Queries) UpdateInputBlock(ctx context.Context, arg UpdateInputBlockParams) error {
+	_, err := q.db.Exec(ctx, updateInputBlock, arg.DataBlockID, arg.LlmID, arg.ID)
+	return err
+}
+
+const updateLlmBlock = `-- name: UpdateLlmBlock :exec
+UPDATE llm_blocks
+SET input_block_id=$1, llm_type=$2, model=$3,prompt=$4,llm_endpoint=$5,template=$6,widget_block_id=$7
+WHERE id=$8
+`
+
+type UpdateLlmBlockParams struct {
+	InputBlockID  pgtype.Int8
+	LlmType       string
+	Model         string
+	Prompt        string
+	LlmEndpoint   string
+	Template      string
+	WidgetBlockID int64
+	ID            int32
+}
+
+func (q *Queries) UpdateLlmBlock(ctx context.Context, arg UpdateLlmBlockParams) error {
+	_, err := q.db.Exec(ctx, updateLlmBlock,
+		arg.InputBlockID,
+		arg.LlmType,
+		arg.Model,
+		arg.Prompt,
+		arg.LlmEndpoint,
+		arg.Template,
+		arg.WidgetBlockID,
+		arg.ID,
+	)
+	return err
+}
+
+const updatePipeLine = `-- name: UpdatePipeLine :exec
+UPDATE pipelines
+SET title=$1, pipeline_description=$2
+WHERE id=$3
+`
+
+type UpdatePipeLineParams struct {
+	Title               string
+	PipelineDescription string
+	ID                  int32
+}
+
+func (q *Queries) UpdatePipeLine(ctx context.Context, arg UpdatePipeLineParams) error {
+	_, err := q.db.Exec(ctx, updatePipeLine, arg.Title, arg.PipelineDescription, arg.ID)
+	return err
+}
+
+const updateTextSplitter = `-- name: UpdateTextSplitter :exec
+UPDATE text_splitters
+SET data_block_id=$1, splitter_type=$2, config=$3
+WHERE id=$4
+`
+
+type UpdateTextSplitterParams struct {
+	DataBlockID  pgtype.Int8
+	SplitterType string
+	Config       string
+	ID           int32
+}
+
+func (q *Queries) UpdateTextSplitter(ctx context.Context, arg UpdateTextSplitterParams) error {
+	_, err := q.db.Exec(ctx, updateTextSplitter,
+		arg.DataBlockID,
+		arg.SplitterType,
+		arg.Config,
+		arg.ID,
+	)
+	return err
+}
+
+const updateVectorStore = `-- name: UpdateVectorStore :exec
+UPDATE vector_stores
+SET data_block_id=$1, store_type=$2, collection_name=$3, persist_directory=$4
+WHERE id=$5
+`
+
+type UpdateVectorStoreParams struct {
+	DataBlockID      pgtype.Int8
+	StoreType        string
+	CollectionName   string
+	PersistDirectory string
+	ID               int32
+}
+
+func (q *Queries) UpdateVectorStore(ctx context.Context, arg UpdateVectorStoreParams) error {
+	_, err := q.db.Exec(ctx, updateVectorStore,
+		arg.DataBlockID,
+		arg.StoreType,
+		arg.CollectionName,
+		arg.PersistDirectory,
+		arg.ID,
+	)
+	return err
+}
+
+const updateWidgetBlock = `-- name: UpdateWidgetBlock :exec
+UPDATE widget_blocks
+SET llm_block_id=$1, image_url=$2, styles=$3
+WHERE id=$4
+`
+
+type UpdateWidgetBlockParams struct {
+	LlmBlockID pgtype.Int8
+	ImageUrl   string
+	Styles     []byte
+	ID         int32
+}
+
+func (q *Queries) UpdateWidgetBlock(ctx context.Context, arg UpdateWidgetBlockParams) error {
+	_, err := q.db.Exec(ctx, updateWidgetBlock,
+		arg.LlmBlockID,
+		arg.ImageUrl,
+		arg.Styles,
+		arg.ID,
+	)
+	return err
+}

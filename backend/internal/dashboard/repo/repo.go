@@ -23,4 +23,11 @@ type GraphRepo interface {
 	DeleteTextSplitter(ctx context.Context, id int64) error
 	DeleteVectorStore(ctx context.Context, id int64) error
 	DeleteLLMBlock(ctx context.Context, id int64) error
+
+	UpdateInputBlock(ctx context.Context, id int64, payload models.CreateInputBlock) error
+	UpdateDataBlock(ctx context.Context, id int64, payload models.CreateDataBlock) error
+	UpdateWidgetBlock(ctx context.Context, id int64, payload models.CreateWidgetBlock) error
+	UpdateTextSplitter(ctx context.Context, id int64, payload models.CreateTextSplitter) error
+	UpdateVectorStore(ctx context.Context, id int64, payload models.CreateVectorStore) error
+	UpdateLLMBlock(ctx context.Context, id int64, payload models.CreateLLMBlock) error
 }

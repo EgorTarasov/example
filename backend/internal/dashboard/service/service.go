@@ -29,6 +29,13 @@ type Service interface {
 	DeleteTextSplitter(ctx context.Context, id int64) error
 	DeleteVectorStore(ctx context.Context, id int64) error
 	DeleteLLMBlock(ctx context.Context, id int64) error
+
+	UpdateInputBlock(ctx context.Context, id int64, payload models.CreateInputBlock) error
+	UpdateDataBlock(ctx context.Context, id int64, payload models.CreateDataBlock) error
+	UpdateWidgetBlock(ctx context.Context, id int64, payload models.CreateWidgetBlock) error
+	UpdateTextSplitter(ctx context.Context, id int64, payload models.CreateTextSplitter) error
+	UpdateVectorStore(ctx context.Context, id int64, payload models.CreateVectorStore) error
+	UpdateLLMBlock(ctx context.Context, id int64, payload models.CreateLLMBlock) error
 }
 
 func New(graphRepo repo.GraphRepo) Service {
@@ -91,4 +98,26 @@ func (s *service) DeleteVectorStore(ctx context.Context, id int64) error {
 
 func (s *service) DeleteLLMBlock(ctx context.Context, id int64) error {
 	return s.graph.DeleteLLMBlock(ctx, id)
+}
+
+func (s *service) UpdateDataBlock(ctx context.Context, id int64, payload models.CreateDataBlock) error {
+	return s.graph.UpdateDataBlock(ctx, id, payload)
+}
+
+func (s *service) UpdateInputBlock(ctx context.Context, id int64, payload models.CreateInputBlock) error {
+	return s.graph.UpdateInputBlock(ctx, id, payload)
+}
+func (s *service) UpdateWidgetBlock(ctx context.Context, id int64, payload models.CreateWidgetBlock) error {
+	return s.graph.UpdateWidgetBlock(ctx, id, payload)
+}
+func (s *service) UpdateTextSplitter(ctx context.Context, id int64, payload models.CreateTextSplitter) error {
+	return s.graph.UpdateTextSplitter(ctx, id, payload)
+}
+
+func (s *service) UpdateVectorStore(ctx context.Context, id int64, payload models.CreateVectorStore) error {
+	return s.graph.UpdateVectorStore(ctx, id, payload)
+}
+
+func (s *service) UpdateLLMBlock(ctx context.Context, id int64, payload models.CreateLLMBlock) error {
+	return s.graph.UpdateLLMBlock(ctx, id, payload)
 }
