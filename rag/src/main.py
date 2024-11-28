@@ -16,7 +16,7 @@ logging.basicConfig(
 )
 
 
-def main(url: str) -> None:
+def buildPipeline(url: str) -> None:
     embedder, store = create_pgvector(
         connection_dsn="postgresql+psycopg://pg-user:pg-password@10.0.1.70:5432/t1-dev",
         embedding_model="Tochka-AI/ruRoPEBert-e5-base-2k",

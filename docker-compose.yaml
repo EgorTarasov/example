@@ -14,6 +14,22 @@ services:
     ports:
       - "9999:9999"
 
+  pipeline:
+    image: ghcr.io/egortarasov/example/pipeline:latest
+    build:
+        context: ./rag
+        dockerfile: /rag.Dockerfile
+    command: fastapi run /app/src/api.py
+    ports:
+      - "8000:8000"
+    environment:
+    - POSTGRES_USER=${POSTGRES_USER:-pg-user}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pg-password}
+    - POSTGRES_DB=${POSTGRES_DB:-t1-dev}
+    - POSTGRES_HOST=${POSTGRES_HOST:-pg}
+    - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    - BACKEND_URL="http://backend:9999"
+
   pg:
     image: pgvector/pgvector:pg17
     restart: always
