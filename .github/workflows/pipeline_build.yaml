@@ -44,5 +44,5 @@ jobs:
         context: ./rag
         file: ./rag/Dockerfile
         platforms: linux/amd64
-        tags: ghcr.io/egortarasov/example/backend:${{ steps.extract_branch.outputs.tag }}
+        tags: ghcr.io/egortarasov/example/pipeline:${{ steps.extract_branch.outputs.tag }}
         push: true
