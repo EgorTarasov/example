@@ -3,6 +3,7 @@ import { rootStore } from '../stores/RootStore.ts'
 import { Navbar } from '@/components/navbar.tsx';
 import ApiService from '@/api/ApiService.ts';
 import { ChatBotWidget } from '@/components/chat-bot-widget.tsx';
+import { defaultTheme } from '@/models/customTheme.ts';
 
 
 
@@ -32,7 +33,7 @@ export const Route = createFileRoute('/_authenticated')({
 
 function RouteComponent() {
   return <>
-    <ChatBotWidget/>
+    <ChatBotWidget customTheme={defaultTheme}/>
     <Navbar />
     <Outlet />
   </>

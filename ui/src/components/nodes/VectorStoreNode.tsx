@@ -8,13 +8,15 @@ import { Input } from '../ui/input';
 
 export type VectorStoreNodeType = Node<{
     dto: VectorStoreDto;
+    type: VectorStoreDto
+    collectionName: VectorStoreDto
 }, 'vectorStoreBlock'>;
 
 
 
 const VectorStoreBlock = ({ data, isConnectable, id }: NodeProps<VectorStoreNodeType>) => {
-    const [type, setType] = useState(data.dto.type);
-    const [collectionName, setCollectionName] = useState(data.dto.collectionName);
+    const [type, setType] = useState(data?.dto?.type || 'chroma');
+    const [collectionName, setCollectionName] = useState(data?.dto?.collectionName || '');
     
 
     const typeOptions = [
@@ -43,7 +45,7 @@ const VectorStoreBlock = ({ data, isConnectable, id }: NodeProps<VectorStoreNode
                     <div className="flex flex-col gap-2 w-2/2">
                         <div className="font-bold text-sm border-b pb-2">Vector Store Block</div>
                         <div className="text-xs space-y-2">
-                            <div>ID: {data.dto.id}</div>
+                            <div>ID: {data?.dto?.id || 1}</div>
                             <Select
                                 value={type}
                                 onValueChange={(value) => setType(value)}

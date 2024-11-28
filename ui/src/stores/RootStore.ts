@@ -11,7 +11,8 @@ export class RootStore {
 
     token: LoginResponse | null = null;
     currentPipelineId: number | null = null;
-
+    isLoading: boolean = true;
+    isFetched: boolean = false;
     constructor() {
         makeAutoObservable(this);
     }
@@ -30,6 +31,14 @@ export class RootStore {
             apiService.setAuthToken(token);
         }
 
+    }
+
+    changeLoading( isLoading: boolean ){
+        this.isLoading = isLoading;
+    }
+
+    changeFetched( isFetched: boolean ){
+        this.isFetched = isFetched;
     }
 
     async login(loginInfo: LoginInfo) {

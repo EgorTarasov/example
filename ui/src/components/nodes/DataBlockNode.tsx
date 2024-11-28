@@ -6,12 +6,15 @@ import { DataBlockDto } from '@/api/models/models';
 import { isValidConnection } from './utils';
 
 export type DataBlockNodeType = Node<{
+    id: DataBlockDto;
     dto: DataBlockDto;
+    type: DataBlockDto;
+    url: DataBlockDto;
 }, 'dataBlock'>;
 
 const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>) => {
-    const [type, setType] = useState(data.dto.type);
-    const [url, setUrl] = useState(data.dto.url);
+    const [type, setType] = useState(data.type.toString());
+    const [url, setUrl] = useState(data.url.toString());
 
     const typeOptions = [
         { value: 'txt', label: 'Text' },
@@ -39,7 +42,7 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
                     <div className="flex flex-col gap-2 w-1/2">
                         <div className="font-bold text-sm border-b pb-2">Data Block</div>
                         <div className="text-xs space-y-2">
-                            <div>ID: {data.dto.id}</div>
+                            <div>ID: {data.id.toString()}</div>
                             <Select
                                 value={type}
                                 onValueChange={(value) => setType(value)}

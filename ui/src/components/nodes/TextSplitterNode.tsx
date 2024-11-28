@@ -7,12 +7,13 @@ import { isValidConnection } from './utils';
 
 export type TextSplitterNodeType = Node<{
     dto: TextSplitterDto;
+    type: TextSplitterDto
 }, 'dataBlock'>;
 
 
 
 const TextSplitterBlock = ({ data, isConnectable, id }: NodeProps<TextSplitterNodeType>) => {
-    const [type, setType] = useState(data.dto.type);
+    const [type, setType] = useState(data?.dto?.type || 'TokenTextSplitter');
     
 
     const typeOptions = [
@@ -39,7 +40,7 @@ const TextSplitterBlock = ({ data, isConnectable, id }: NodeProps<TextSplitterNo
                     <div className="flex flex-col gap-2 w-2/2">
                         <div className="font-bold text-sm border-b pb-2">Text Splitter Block</div>
                         <div className="text-xs space-y-2">
-                            <div>ID: {data.dto.id}</div>
+                            <div>ID: {data?.dto?.id || 1}</div>
                             <Select
                                 value={type}
                                 onValueChange={(value) => setType(value)}

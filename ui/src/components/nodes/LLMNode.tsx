@@ -8,12 +8,14 @@ import { isValidConnection } from './utils';
 import axios from 'axios';
 
 export type LLMNodeType = Node<{
+    id: LLMDto;
     dto: LLMDto;
+    type: LLMDto;
 }, 'llm'>;
 
 
 const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
-    const [type, setType] = useState(data.dto.type);
+    const [type, setType] = useState(data.type.toString());
     const [endpoint, setEndpoint] = useState("http://10.0.1.70:7869/api/generate");
     const [prompt, setPrompt] = useState('Привет! Ты цифровой ассистент?');
     const [template] = useState('');
@@ -78,7 +80,7 @@ const LLMNode = ({ data, isConnectable, id }: NodeProps<LLMNodeType>) => {
                     <div className="flex flex-col gap-2 w-1/2">
                         <div className="font-bold text-sm border-b pb-2">LLM Node</div>
                         <div className="text-xs space-y-2">
-                            <div>ID: {data.dto.id}</div>
+                            <div>ID: {data.id.toString()}</div>
                             <Select
                                 value={type}
                                 onValueChange={(value) => setType(value)}

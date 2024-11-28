@@ -57,7 +57,7 @@ export const defaultValues: NodeData = {
 };
 
 
-export function createNode(type: string, position: { x: number  , y: number } = {x: 0, y: 0}): Node {
+export function createNode(pipelineId: string | undefined ,type: string, position: { x: number  , y: number } = {x: 0, y: 0}): Node {
     let nodeId = '';
     const nodeTypes = {
         dataBlock: { type: 'dataBlock', data: { dto: defaultValues.dataBlock } },
@@ -67,6 +67,7 @@ export function createNode(type: string, position: { x: number  , y: number } = 
         vectorStore: { type: 'vectorStore', data: { dto: defaultValues.vectorStore } },
         widget: { type: 'widget', data: { dto: defaultValues.widget } }
     };
+    
     function getCurrentURL () {
         return window.location.href
     };
@@ -78,7 +79,8 @@ export function createNode(type: string, position: { x: number  , y: number } = 
         id: string
     }
     const handleCreate = async () => {
-        const endpoint = `https://larek.tech/api/dashboard/pipeline/11/${type}`
+
+        const endpoint = `https://larek.tech/api/dashboard/pipeline/${pipelineId}/${type}`
         const typeValue: NodeType = type as NodeType;
 
         const res = await axios.post<resID>(endpoint, nodeTypes[typeValue].data);

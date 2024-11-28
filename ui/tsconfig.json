@@ -11,6 +11,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@dagrejs/dagre": ["./node_modules/@dagrejs/dagre"],
       "@/*": [
         "./src/*"
       ]
