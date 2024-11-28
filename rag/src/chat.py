@@ -91,7 +91,7 @@ CHAT_HTML = """
         <script>
             const messages = document.getElementById('messages');
             const messageText = document.getElementById('messageText');
-            const ws = new WebSocket(`ws://${{window.location.host}}/pipeline/{pipeline_id}/ws`);
+            const ws = new WebSocket(`wss://chat.larek.tech/pipeline/{pipeline_id}/ws`);
 
             ws.onmessage = function(event) {{
                 const data = JSON.parse(event.data);
