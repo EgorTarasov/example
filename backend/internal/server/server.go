@@ -106,11 +106,6 @@ func NewServer(cfg *Config) Server {
 	dashboardHandler := dashboardHandlers.NewHandler(dashboardService)
 	dashboardHandlers.InitRoutes(api, views, dashboardHandler)
 
-	dashboardRepo := dashboardRepos.NewPgRepo(pool)
-	dashboardService := dashboardService.New(dashboardRepo)
-	dashboardHandler := dashboardHandlers.NewHandler(dashboardService)
-	dashboardHandlers.InitRoutes(api, views, dashboardHandler)
-
 	return &server{
 		app:    app,
 		cfg:    cfg,
