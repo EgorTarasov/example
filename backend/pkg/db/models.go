@@ -9,7 +9,7 @@ import (
 )
 
 type DataBlock struct {
-	ID             int64
+	ID             int32
 	InputBlockID   pgtype.Int8
 	StorageUrl     string
 	StorageType    string
@@ -17,10 +17,11 @@ type DataBlock struct {
 	VectorStoreID  int64
 	CreatedAt      pgtype.Timestamp
 	UpdatedAt      pgtype.Timestamp
+	PipelineID     pgtype.Int8
 }
 
 type InputBlock struct {
-	ID          int64
+	ID          int32
 	PipelineID  pgtype.Int8
 	DataBlockID int64
 	LlmID       int64
@@ -30,8 +31,9 @@ type InputBlock struct {
 }
 
 type LlmBlock struct {
-	ID            int64
+	ID            int32
 	InputBlockID  pgtype.Int8
+	LlmEndpoint   string
 	LlmType       string
 	Model         string
 	Prompt        string
@@ -39,6 +41,7 @@ type LlmBlock struct {
 	WidgetBlockID int64
 	CreatedAt     pgtype.Timestamp
 	UpdatedAt     pgtype.Timestamp
+	PipelineID    pgtype.Int8
 }
 
 type OauthProvider struct {
@@ -54,8 +57,8 @@ type OauthUser struct {
 }
 
 type Pipeline struct {
-	ID                  int64
-	UserID              int64
+	ID                  int32
+	UserID              pgtype.Int8
 	Title               string
 	PipelineDescription string
 	CreatedAt           pgtype.Timestamp
@@ -82,12 +85,13 @@ type TelegramDatum struct {
 }
 
 type TextSplitter struct {
-	ID           int64
+	ID           int32
 	DataBlockID  pgtype.Int8
 	SplitterType string
 	Config       string
 	CreatedAt    pgtype.Timestamp
 	UpdatedAt    pgtype.Timestamp
+	PipelineID   pgtype.Int8
 }
 
 type User struct {
@@ -104,20 +108,22 @@ type UserRole struct {
 }
 
 type VectorStore struct {
-	ID               int64
+	ID               int32
 	DataBlockID      pgtype.Int8
 	StoreType        string
 	CollectionName   string
 	PersistDirectory string
 	CreatedAt        pgtype.Timestamp
 	UpdatedAt        pgtype.Timestamp
+	PipelineID       pgtype.Int8
 }
 
 type WidgetBlock struct {
-	ID         int64
+	ID         int32
 	LlmBlockID pgtype.Int8
 	ImageUrl   string
-	Styles     string
+	Styles     []byte
 	CreatedAt  pgtype.Timestamp
 	UpdatedAt  pgtype.Timestamp
+	PipelineID pgtype.Int8
 }

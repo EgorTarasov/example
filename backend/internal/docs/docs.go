@@ -124,7 +124,106 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/dashboard/pipelines": {
+        "/api/dashboard/": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a specific dashboard for the authenticated user using its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dashboards"
+                ],
+                "summary": "Retrieve a dashboard by its ID",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PipeLineDashboardDto"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dashboard/inputblock": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new input block for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipelines"
+                ],
+                "summary": "Create a new input block",
+                "parameters": [
+                    {
+                        "description": "Create Input Block Payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateInputBlock"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "id",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dashboard/pipeline": {
             "post": {
                 "security": [
                     {
@@ -224,6 +323,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.CreateInputBlock": {
+            "type": "object",
+            "properties": {
+                "data_block_id": {
+                    "type": "integer"
+                },
+                "llm_id": {
+                    "type": "integer"
+                },
+                "pipeline_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.CreatePipeLine": {
             "type": "object",
             "properties": {
@@ -235,6 +348,20 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.PipeLineDashboardDto": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -255,7 +382,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "larek.tech",
+	Host:             "localhost:9999",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "t1 api",

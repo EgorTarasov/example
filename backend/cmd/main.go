@@ -16,7 +16,7 @@ import (
 // @contact.email	fiber@swagger.io
 // @license.name	BSD 3-Clause License
 // @license.url	https://raw.githubusercontent.com/EgorTarasov/example/main/LICENSE
-// @host			larek.tech
+// @host			localhost:9999
 // @BasePath		/
 func main() {
 	configPath := flag.String("config", "config.yaml", "path to config file")

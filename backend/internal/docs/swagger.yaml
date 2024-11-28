@@ -29,6 +29,15 @@ definitions:
       type:
         type: string
     type: object
+  models.CreateInputBlock:
+    properties:
+      data_block_id:
+        type: integer
+      llm_id:
+        type: integer
+      pipeline_id:
+        type: integer
+    type: object
   models.CreatePipeLine:
     properties:
       description:
@@ -38,6 +47,15 @@ definitions:
       user_id:
         type: integer
     type: object
+  models.PipeLineDashboardDto:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
   models.UserData:
     properties:
       role:
@@ -45,7 +63,7 @@ definitions:
       user_id:
         type: integer
     type: object
-host: larek.tech
+host: localhost:9999
 info:
   contact:
     email: fiber@swagger.io
@@ -124,7 +142,72 @@ paths:
       summary: Register with email
       tags:
       - auth
-  /api/dashboard/pipelines:
+  /api/dashboard/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific dashboard for the authenticated user using
+        its ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dashboard details
+          schema:
+            items:
+              $ref: '#/definitions/models.PipeLineDashboardDto'
+            type: array
+        "400":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Retrieve a dashboard by its ID
+      tags:
+      - dashboards
+  /api/dashboard/inputblock:
+    post:
+      consumes:
+      - application/json
+      description: Create a new input block for the authenticated user
+      parameters:
+      - description: Create Input Block Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateInputBlock'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new input block
+      tags:
+      - pipelines
+  /api/dashboard/pipeline:
     post:
       consumes:
       - application/json
