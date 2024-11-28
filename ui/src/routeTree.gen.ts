@@ -16,9 +16,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedSettingsImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedConstructorImport } from './routes/_authenticated/constructor'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
+import { Route as AuthenticatedPipelinePipelineIdImport } from './routes/_authenticated/pipeline.$pipelineId'
 
 // Create Virtual Routes
 
@@ -56,12 +56,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const AuthenticatedConstructorRoute = AuthenticatedConstructorImport.update({
-  id: '/constructor',
-  path: '/constructor',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-
 const authRegisterRoute = authRegisterImport.update({
   id: '/(auth)/register',
   path: '/register',
@@ -73,6 +67,13 @@ const authLoginRoute = authLoginImport.update({
   path: '/login',
   getParentRoute: () => rootRoute,
 } as any)
+
+const AuthenticatedPipelinePipelineIdRoute =
+  AuthenticatedPipelinePipelineIdImport.update({
+    id: '/pipeline/$pipelineId',
+    path: '/pipeline/$pipelineId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -113,13 +114,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof rootRoute
     }
-    '/_authenticated/constructor': {
-      id: '/_authenticated/constructor'
-      path: '/constructor'
-      fullPath: '/constructor'
-      preLoaderRoute: typeof AuthenticatedConstructorImport
-      parentRoute: typeof AuthenticatedImport
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -134,21 +128,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/pipeline/$pipelineId': {
+      id: '/_authenticated/pipeline/$pipelineId'
+      path: '/pipeline/$pipelineId'
+      fullPath: '/pipeline/$pipelineId'
+      preLoaderRoute: typeof AuthenticatedPipelinePipelineIdImport
+      parentRoute: typeof AuthenticatedImport
+    }
   }
 }
 
 // Create and export the route tree
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedConstructorRoute: typeof AuthenticatedConstructorRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedPipelinePipelineIdRoute: typeof AuthenticatedPipelinePipelineIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedConstructorRoute: AuthenticatedConstructorRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedPipelinePipelineIdRoute: AuthenticatedPipelinePipelineIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -161,9 +162,9 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutLazyRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/constructor': typeof AuthenticatedConstructorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/pipeline/$pipelineId': typeof AuthenticatedPipelinePipelineIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -172,9 +173,9 @@ export interface FileRoutesByTo {
   '/about': typeof AboutLazyRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/constructor': typeof AuthenticatedConstructorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/pipeline/$pipelineId': typeof AuthenticatedPipelinePipelineIdRoute
 }
 
 export interface FileRoutesById {
@@ -184,9 +185,9 @@ export interface FileRoutesById {
   '/about': typeof AboutLazyRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
-  '/_authenticated/constructor': typeof AuthenticatedConstructorRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/pipeline/$pipelineId': typeof AuthenticatedPipelinePipelineIdRoute
 }
 
 export interface FileRouteTypes {
@@ -197,9 +198,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/register'
-    | '/constructor'
     | '/dashboard'
     | '/settings'
+    | '/pipeline/$pipelineId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -207,9 +208,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/register'
-    | '/constructor'
     | '/dashboard'
     | '/settings'
+    | '/pipeline/$pipelineId'
   id:
     | '__root__'
     | '/'
@@ -217,9 +218,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/(auth)/login'
     | '/(auth)/register'
-    | '/_authenticated/constructor'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
+    | '/_authenticated/pipeline/$pipelineId'
   fileRoutesById: FileRoutesById
 }
 
@@ -262,9 +263,9 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated.tsx",
       "children": [
-        "/_authenticated/constructor",
         "/_authenticated/dashboard",
-        "/_authenticated/settings"
+        "/_authenticated/settings",
+        "/_authenticated/pipeline/$pipelineId"
       ]
     },
     "/about": {
@@ -276,16 +277,16 @@ export const routeTree = rootRoute
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx"
     },
-    "/_authenticated/constructor": {
-      "filePath": "_authenticated/constructor.tsx",
-      "parent": "/_authenticated"
-    },
     "/_authenticated/dashboard": {
       "filePath": "_authenticated/dashboard.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/settings": {
       "filePath": "_authenticated/settings.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/pipeline/$pipelineId": {
+      "filePath": "_authenticated/pipeline.$pipelineId.tsx",
       "parent": "/_authenticated"
     }
   }

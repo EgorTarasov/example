@@ -1,28 +1,31 @@
 import { memo, useState } from 'react';
 import { Handle, Position, NodeProps, Node } from '@xyflow/react';
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
-import { DataBlockDto } from '@/api/models/models';
+import { VectorStoreDto } from '@/api/models/models';
 import { isValidConnection } from './utils';
+import { Input } from '../ui/input';
 
-export type DataBlockNodeType = Node<{
-    id: DataBlockDto;
-    dto: DataBlockDto;
-    type: DataBlockDto;
-    url: DataBlockDto;
-}, 'dataBlock'>;
+export type VectorStoreNodeType = Node<{
+    dto: VectorStoreDto;
+    type: VectorStoreDto
+    collectionName: VectorStoreDto
+}, 'vectorStoreBlock'>;
 
-const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>) => {
-    const [type, setType] = useState(data.type.toString());
-    const [url, setUrl] = useState(data.url.toString());
+
+
+const VectorStoreBlock = ({ data, isConnectable, id }: NodeProps<VectorStoreNodeType>) => {
+    const [type, setType] = useState(data?.dto?.type || 'chroma');
+    const [collectionName, setCollectionName] = useState(data?.dto?.collectionName || '');
+    
 
     const typeOptions = [
-        { value: 'txt', label: 'Text' },
-        { value: 'pdf', label: 'PDF' },
-        { value: 'notion', label: 'Notion' },
-        { value: 'confluence', label: 'Confluence' }
+        { value: 'chroma', label: 'Chroma' },
+        { value: 'qdrant', label: 'Qdrant' },
+        { value: 'click', label: 'Click' },
+        { value: 'pgvector', label: 'Pgvector' }
     ];
-
+    //Chroma, qdrant, click, pgvector
     const handleParse = () => {
         console.log('Parsing data...');
     };
@@ -32,17 +35,17 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
             <Handle
                 type="target"
                 position={Position.Top}
-                id={`dataBlock|${id}|target`}
+                id={`textSplitter|${id}|target`}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
                 isValidConnection={isValidConnection}
             />
             <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200">
-                <div className="flex flex-row gap-2 w-[500px] h-[300px]">
-                    <div className="flex flex-col gap-2 w-1/2">
-                        <div className="font-bold text-sm border-b pb-2">Data Block</div>
+                <div className="flex w-[250px] h-[220px]">
+                    <div className="flex flex-col gap-2 w-2/2">
+                        <div className="font-bold text-sm border-b pb-2">Vector Store Block</div>
                         <div className="text-xs space-y-2">
-                            <div>ID: {data.id.toString()}</div>
+                            <div>ID: {data?.dto?.id || 1}</div>
                             <Select
                                 value={type}
                                 onValueChange={(value) => setType(value)}
@@ -50,7 +53,7 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select Type" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className='w-full'>
                                     {typeOptions.map(option => (
                                         <SelectItem key={option.value} value={option.value}>
                                             {option.label}
@@ -58,13 +61,15 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
                                     ))}
                                 </SelectContent>
                             </Select>
+
                             <Input
                                 className="nodrag"
                                 type="text"
-                                value={url}
-                                onChange={(e) => setUrl(e.target.value)}
-                                placeholder="Enter URL"
+                                value={collectionName}
+                                onChange={(e) => setCollectionName(e.target.value)}
+                                placeholder="Enter collection name"
                             />
+                            
                             <button
                                 className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
                                 onClick={handleParse}
@@ -73,25 +78,10 @@ const DataBlockNode = ({ data, isConnectable, id }: NodeProps<DataBlockNodeType>
                             </button>
                         </div>
                     </div>
-                    <div className="flex-1 overflow-hidden w-1/2">
-                        <iframe
-                            src={url}
-                            className="w-full h-full border-0"
-                            title="Preview"
-                        />
-                    </div>
                 </div>
             </div>
-            <Handle
-                type="source"
-                position={Position.Bottom}
-                id={`dataBlock|${id}|source`}
-                isConnectable={isConnectable}
-                style={{ width: '8px', height: '8px', background: '#555' }}
-                isValidConnection={isValidConnection}
-            />
         </>
     );
 };
 
-export default memo(DataBlockNode);
+export default memo(VectorStoreBlock);

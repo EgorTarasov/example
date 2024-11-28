@@ -1,7 +1,9 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { rootStore } from '../stores/RootStore.ts'
 import { Navbar } from '@/components/navbar.tsx';
-import AuthApiService from '@/api/AuthApiService.ts';
+import ApiService from '@/api/ApiService.ts';
+import { ChatBotWidget } from '@/components/chat-bot-widget.tsx';
+import { defaultTheme } from '@/models/customTheme.ts';
 
 
 
@@ -11,7 +13,8 @@ export const Route = createFileRoute('/_authenticated')({
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          await AuthApiService.me();
+          ApiService.setAuthToken(token);
+          await ApiService.me();
         } catch (error) {
           localStorage.removeItem('token');
           throw redirect({
@@ -30,6 +33,7 @@ export const Route = createFileRoute('/_authenticated')({
 
 function RouteComponent() {
   return <>
+    <ChatBotWidget customTheme={defaultTheme}/>
     <Navbar />
     <Outlet />
   </>

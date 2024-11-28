@@ -1,44 +1,72 @@
 import { makeAutoObservable } from "mobx";
-import authApiService from "@/api/AuthApiService.ts";
+import apiService from "@/api/ApiService.ts";
 import { LoginInfo, LoginResponse } from "@/api/models/auth.ts";
 import { RegisterInfo } from "@/api/models/register.ts";
+import { CreatePipeLine } from "@/api/models/models";
+
+
 
 
 export class RootStore {
 
     token: LoginResponse | null = null;
-
-
+    currentPipelineId: number | null = null;
+    isLoading: boolean = true;
+    isFetched: boolean = false;
     constructor() {
         makeAutoObservable(this);
     }
-    saveToken() {
-        if (this.token) {
-            localStorage.setItem('token', JSON.stringify(this.token));
-        }
+    saveToken(token: string) {
+        localStorage.setItem('token', token);
+        apiService.setAuthToken(token);
     }
 
     loadToken() {
         const token = localStorage.getItem('token');
         if (token) {
-            this.token = JSON.parse(token);
+            this.token = {
+                access_token: token,
+                type: 'Bearer',
+            };
+            apiService.setAuthToken(token);
         }
+
+    }
+
+    changeLoading( isLoading: boolean ){
+        this.isLoading = isLoading;
+    }
+
+    changeFetched( isFetched: boolean ){
+        this.isFetched = isFetched;
     }
 
     async login(loginInfo: LoginInfo) {
-        this.token = await authApiService.login(loginInfo);
-        this.saveToken();
-        console.log(this.token);
+        const token = await apiService.login(loginInfo);
+        this.token = token;
+        this.saveToken(token.access_token);
     }
 
     async singup(registerInfo: RegisterInfo) {
-        this.token = await authApiService.register(registerInfo);
-        console.log('Registered, token:' + this.token);
-        this.saveToken();
+        const token = await apiService.register(registerInfo);
+        this.token = token;
+        this.saveToken(token.access_token);
     }
 
     async logout() {
         this.token = null
+    }
+
+    async createPipeline(pipelineInfo: CreatePipeLine) {
+
+        console.log('Creating pipeline');
+        const response = await apiService.createPipeLine({
+            title: pipelineInfo.title,
+            description: pipelineInfo.description,
+        });
+        this.currentPipelineId = response.id;
+        console.log('Created pipeline with id ' + response.id);
+
     }
 }
 
