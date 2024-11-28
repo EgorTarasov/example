@@ -62,8 +62,8 @@ class PipeLine:
             logger.info(f"added {len(batch)} documents to store")
             logger.info(f"processed {idx}/ {len(batches)} batches")
 
-    def query(self, query: str) -> str:
-        return self.rag_chain.invoke({"input": query})
+    async def query(self, query: str) -> str:
+        return await self.rag_chain.ainvoke({"input": query})
 
     async def stream(self, query):
         async for chunk in self.rag_chain.astream({"input": query}):
