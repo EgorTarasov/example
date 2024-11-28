@@ -12,6 +12,9 @@ from dotenv import load_dotenv
 import models
 from graph import build_tree, map_nodes
 from build import build_pipeline_from_tree
+from fastapi.responses import HTMLResponse
+from chat import CHAT_HTML
+
 
 load_dotenv(".env")
 BACKEND_URL = os.getenv("BACKEND_URL")
@@ -173,3 +176,19 @@ async def stream_pipeline(
         print(e)
     finally:
         await websocket.close()
+
+
+@app.get("/pipeline/{pipeline_id}/chat", response_class=HTMLResponse)
+async def get_chat_page(
+    pipeline_id: int,
+):
+    response = httpx.get(f"{BACKEND_URL}/api/dashboard/pipeline/{pipeline_id}/")
+    data = response.json()
+
+    return HTMLResponse(
+        CHAT_HTML.format(
+            pipeline_id=pipeline_id,
+            title=data["title"],
+            description=data["description"],
+        )
+    )
