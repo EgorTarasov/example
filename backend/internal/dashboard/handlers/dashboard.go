@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/EgorTarasov/example/internal/auth"
+	"github.com/EgorTarasov/example/internal/auth/middleware"
 	"github.com/EgorTarasov/example/internal/dashboard/service"
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,7 +35,7 @@ func initApi(api fiber.Router, h Handler) error {
 	dashboard := api.Group("/dashboard")
 	// dashboard.Post("/datablock", h.CreateDataBlock)
 	// dashboard.Post("/inputblock", h.CreateInputBlock)
-	dashboard.Post("/pipeline", h.CreatePipeline)
+	dashboard.Post("/pipeline", middleware.RoleMiddleware(auth.Admin), h.CreatePipeline)
 	// dashboard.Post("/widgetblock", h.CreateWidgetBlock)
 	// dashboard.Post("/textsplitterblock", h.CreateTextSplitter)
 	// dashboard.Post("/vectorstoreblock", h.CreateVectorStore)

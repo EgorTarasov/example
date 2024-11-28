@@ -5,18 +5,26 @@ import { Input } from "@/components/ui/input";
 import { isValidConnection } from './utils';
 
 export type InputBlockNodeType = Node<{
-    dto: InputBlockDto;
+    id: InputBlockDto
+    data_block_id: InputBlockDto;
+    llm_id: InputBlockDto;
+    createdAt: InputBlockDto;
 }, 'inputBlock'>;
 
-const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) => {
-    const [dataBlockId, setDataBlockId] = useState(data.dto.dataBlockId);
-    const [llmId, setLlmId] = useState(data.dto.llmId);
+const InputBlockNode = ({ data, isConnectable, id }: NodeProps<InputBlockNodeType>) => {
+    console.log('InputBlockNode', data);
+    console.log('InputBlockNode', id);
+    console.log('data_block_id', data.data_block_id);
+    console.log('llm_id', data.llm_id);
+    const [dataBlockId, setDataBlockId] = useState(data.data_block_id.toString() || 1);
+    const [llmId, setLlmId] = useState(data.llm_id.toString() || "1");
 
     return (
         <>
             <Handle
                 type="target"
                 position={Position.Top}
+                id={`inputBlock|${id}|target`}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
                 isValidConnection={isValidConnection}
@@ -25,7 +33,7 @@ const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) 
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-sm border-b pb-2">Input Block</div>
                     <div className="text-xs space-y-2">
-                        <div>ID: {data.dto.id}</div>
+                        <div>ID: {data.id.toString()}</div>
                         <div className="flex flex-col gap-1">
                             <label>Data Block ID:</label>
                             <Input
@@ -41,11 +49,11 @@ const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) 
                                 className="nodrag"
                                 type="number"
                                 value={llmId}
-                                onChange={(e) => setLlmId(Number(e.target.value))}
+                                onChange={(e) => setLlmId(e.target.value)}
                             />
                         </div>
                         <div className="text-gray-500 text-[10px]">
-                            Created: {new Date(data.dto.createdAt).toLocaleDateString()}
+                            Created: {new Date(data.createdAt.toString()).toLocaleDateString()}
                         </div>
                     </div>
                 </div>
@@ -53,6 +61,7 @@ const InputBlockNode = ({ data, isConnectable }: NodeProps<InputBlockNodeType>) 
             <Handle
                 type="source"
                 position={Position.Bottom}
+                id={`inputBlock|${id}|source`}
                 isConnectable={isConnectable}
                 style={{ width: '8px', height: '8px', background: '#555' }}
                 isValidConnection={isValidConnection}

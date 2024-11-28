@@ -6,8 +6,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import {Link, useNavigate} from "@tanstack/react-router";
-import {rootStore} from "@/stores/RootStore.ts";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { rootStore } from "@/stores/RootStore.ts";
 
 export function Navbar() {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ export function Navbar() {
     const handleLogout = async () => {
         await rootStore.logout();
         navigate({
-                to: "/login",
+            to: "/login",
         })
 
     }
@@ -23,7 +23,7 @@ export function Navbar() {
         <nav className="border-b">
             <div className="flex h-16 items-center px-4">
                 <Link href="/" className="font-semibold">
-                    SimpleDash
+                    Larek.tech
                 </Link>
                 <div className="ml-auto flex items-center space-x-4">
                     <Button variant="ghost" size="icon">

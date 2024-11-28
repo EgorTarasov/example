@@ -33,6 +33,6 @@ func initApi(api fiber.Router, h Handler) error {
 
 	auth.Post("/signup", h.RegisterWithEmail)
 	auth.Post("/login", h.LoginWithEmail)
-	auth.Get("/me", middleware.RoleMiddleware(module.Doctor), h.MeEndpoint)
+	auth.Get("/me", middleware.RoleMiddleware(module.Admin), h.MeEndpoint)
 	return nil
 }

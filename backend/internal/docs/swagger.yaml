@@ -2,12 +2,12 @@ basePath: /
 definitions:
   auth.UserRole:
     enum:
-    - doctor
-    - patient
+    - admin
+    - customer
     type: string
     x-enum-varnames:
-    - Doctor
-    - Patient
+    - Admin
+    - Customer
   handlers.emailLoginPayload:
     properties:
       email:
@@ -28,6 +28,15 @@ definitions:
         type: string
       type:
         type: string
+    type: object
+  models.CreatePipeLine:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      user_id:
+        type: integer
     type: object
   models.UserData:
     properties:
@@ -115,4 +124,39 @@ paths:
       summary: Register with email
       tags:
       - auth
+  /api/dashboard/pipelines:
+    post:
+      consumes:
+      - application/json
+      description: Create a new pipeline for the authenticated user
+      parameters:
+      - description: Create Pipeline Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreatePipeLine'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new pipeline
+      tags:
+      - pipelines
 swagger: "2.0"

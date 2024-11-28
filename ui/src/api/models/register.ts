@@ -5,7 +5,7 @@ export interface RegisterInfo {
     confirmPassword: string;
 }
 
-export interface RegisterResponce{
-    accessToken: string;
+export interface RegisterResponse {
+    access_token: string;
     type: string;
 }

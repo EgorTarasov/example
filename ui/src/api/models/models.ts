@@ -1,7 +1,17 @@
 // models.ts
 
 export interface CreatePipeLine {
-    name: string;
+    title: string;
+    description: string;
+}
+
+export interface CreatePipeLineResponse {
+    id: number;
+}
+
+export interface PipeLineDashboardDto {
+    id: number;
+    title: string;
     description: string;
 }
 
@@ -102,4 +112,18 @@ export interface WidgetBlockDto {
     id: number;
     imageUrl: string;
     styles: unknown; // interface{} in Go
+}
+
+export interface GenerateResponse {
+    model: string;
+    created_at: string;
+    response: string;
+    done: boolean;
+    context: number[];
+    total_duration: number;
+    load_duration: number;
+    prompt_eval_count: number;
+    prompt_eval_duration: number;
+    eval_count: number;
+    eval_duration: number;
 }

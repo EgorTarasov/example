@@ -4,17 +4,17 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import {Github, Loader2, Twitter} from 'lucide-react'
+import { Github, Loader2, Twitter } from 'lucide-react'
 import Logo from '@/components/logo'
-import {Link, useNavigate} from '@tanstack/react-router'
-import {observer} from "mobx-react";
-import {useStores} from "../../../hooks/useStores.tsx";
+import { Link, useNavigate } from '@tanstack/react-router'
+import { observer } from "mobx-react";
+import { useStores } from '@/hooks/useStores';
 
 
 
 
 
-const LoginPage = observer( () => {
+const LoginPage = observer(() => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,7 @@ const LoginPage = observer( () => {
 
 
 
-    const {rootStore} = useStores();
+    const { rootStore } = useStores();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -34,8 +34,8 @@ const LoginPage = observer( () => {
             navigate({
                 to: "/dashboard",
             })
-        }).finally(()=> {
-                setIsLoading(false)
+        }).finally(() => {
+            setIsLoading(false)
         });
         if (rootStore.token) {
             console.log('Login successful');
@@ -93,14 +93,14 @@ const LoginPage = observer( () => {
                                     required
                                 />
                             </div>
-                            { isLoading ? (<Button disabled={!isLoading} type="submit" className="w-full">
+                            {isLoading ? (<Button disabled={!isLoading} type="submit" className="w-full">
                                 <Loader2 className="animate-spin" />
                                 Please wait
-                            </Button> ):
+                            </Button>) :
                                 (
-                                <Button type="submit" className="w-full">
-                                Log In
-                                </Button>
+                                    <Button type="submit" className="w-full">
+                                        Log In
+                                    </Button>
                                 )
                             }
 
