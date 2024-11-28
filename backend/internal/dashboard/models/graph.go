@@ -52,7 +52,8 @@ type CreateInputBlock struct {
 }
 
 type InputBlockDto struct {
-	Id          int64  `json:"id"`
+	IdString    string `json:"id"`
+	Id          int64  `json:"-"`
 	DataBlockID int64  `json:"data_block_id"`
 	PipeLineID  int64  `json:"pipeline_id"`
 	LLMID       int64  `json:"llm_id"`
@@ -70,7 +71,8 @@ type CreateDataBlock struct {
 }
 
 type DataBlockDto struct {
-	Id             int64  `json:"id"`
+	IdString       string `json:"id"`
+	Id             int64  `json:"-"`
 	Type           string `json:"type"` // txt,pdf, notion, confluence
 	Url            string `json:"url"`
 	TextSplitterID int64  `json:"text_splitter_id"`
@@ -84,7 +86,8 @@ type CreateTextSplitter struct {
 	Config      interface{} `json:"config"`
 }
 type TextSplitterDto struct {
-	Id          int64       `json:"id"`
+	IdString    string      `json:"id"`
+	Id          int64       `json:"-"`
 	Type        string      `json:"type"` // regex, split
 	Config      interface{} `json:"config"`
 	DataBlockID int64       `json:"data_block_id"`
@@ -99,7 +102,8 @@ type CreateVectorStore struct {
 }
 
 type VectorStoreDto struct {
-	Id             int64  `json:"id"`
+	IdString       string `json:"id"`
+	Id             int64  `json:"-"`
 	Type           string `json:"type"` // clichouse, pgvector
 	CollectionName string `json:"collection_name"`
 }
@@ -111,7 +115,8 @@ type CreateWidgetBlock struct {
 }
 
 type WidgetBlockDto struct {
-	Id       int64       `json:"id"`
+	IdString string      `json:"id"`
+	Id       int64       `json:"-"`
 	ImageUrl string      `json:"image_url"`
 	Styles   interface{} `json:"styles"`
 }
@@ -128,7 +133,8 @@ type CreateLLMBlock struct {
 }
 
 type LLMDto struct {
-	Id            int64  `json:"id"`
+	IdString      string `json:"id"`
+	Id            int64  `json:"-"`
 	Type          string `json:"type"`
 	Endpoint      string `json:"endpoint"`
 	Model         string `json:"model"`
@@ -144,6 +150,8 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	)
 	// inputs and edges for data blocks and llms
 	for _, i := range p.InputBlocks {
+		sourceID := "inputBlock" + strconv.FormatInt(i.Id, 10)
+		i.IdString = sourceID
 		nodes = append(nodes, struct {
 			InputBlockDto
 			Block string `json:"block_type"`
@@ -152,7 +160,6 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 			Block:         "input_block",
 		})
 		if i.DataBlockID != 0 {
-			sourceID := "inputBlock" + strconv.FormatInt(i.Id, 10)
 			dest := "dataBlock" + strconv.FormatInt(i.DataBlockID, 10)
 			edges = append(edges, Edge{
 				Id:           sourceID + "-" + dest,
@@ -163,7 +170,6 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 			})
 		}
 		if i.LLMID != 0 {
-			sourceID := "inputBlock" + strconv.FormatInt(i.Id, 10)
 			dest := "llmBlock" + strconv.FormatInt(i.LLMID, 10)
 			edges = append(edges, Edge{
 				Id:           sourceID + "-" + dest,
@@ -176,6 +182,8 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 	// llms and edges for widgets
 	for _, llm := range p.LLMs {
+		sourceID := "llmBlock" + strconv.FormatInt(llm.Id, 10)
+		llm.IdString = sourceID
 		nodes = append(nodes, struct {
 			LLMDto
 			Block string `json:"block_type"`
@@ -184,7 +192,6 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 			Block:  "llm_block",
 		})
 		if llm.WidgetBlockID != 0 {
-			sourceID := "llmBlock" + strconv.FormatInt(llm.Id, 10)
 			dest := "widgetBlock" + strconv.FormatInt(llm.WidgetBlockID, 10)
 			edges = append(edges, Edge{
 				Id:           sourceID + "-" + dest,
@@ -197,6 +204,9 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 
 	for _, data := range p.DataBlocks {
+		sourceID := "dataBlock" + strconv.FormatInt(data.Id, 10)
+		data.IdString = sourceID
+
 		nodes = append(nodes, struct {
 			DataBlockDto
 			Block string `json:"block_type"`
@@ -205,7 +215,6 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 			Block:        "data_block",
 		})
 		if data.TextSplitterID != 0 {
-			sourceID := "dataBlock" + strconv.FormatInt(data.Id, 10)
 			dest := "textSplitter" + strconv.FormatInt(data.TextSplitterID, 10)
 			edges = append(edges, Edge{
 				Id:           sourceID + "-" + dest,
@@ -216,7 +225,6 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 			})
 		}
 		if data.VectorStoreID != 0 {
-			sourceID := "dataBlock" + strconv.FormatInt(data.Id, 10)
 			dest := "vectorStore" + strconv.FormatInt(data.VectorStoreID, 10)
 			edges = append(edges, Edge{
 				Id:           sourceID + "-" + dest,
@@ -229,6 +237,9 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 
 	for _, splitter := range p.TextSplitters {
+		sourceID := "text_splitter" + strconv.FormatInt(splitter.Id, 10)
+		splitter.IdString = sourceID
+
 		nodes = append(nodes, struct {
 			TextSplitterDto
 			Block string `json:"block_type"`
@@ -239,6 +250,9 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 
 	for _, store := range p.VectorStores {
+		sourceID := "vector_store" + strconv.FormatInt(store.Id, 10)
+		store.IdString = sourceID
+
 		nodes = append(nodes, struct {
 			VectorStoreDto
 			Block string `json:"block_type"`
@@ -249,6 +263,9 @@ func (p PipeLineDto) ToPipeLine() PipeLine {
 	}
 
 	for _, widget := range p.Widgets {
+		sourceID := "widget_block" + strconv.FormatInt(widget.Id, 10)
+		widget.IdString = sourceID
+
 		nodes = append(nodes, struct {
 			WidgetBlockDto
 			Block string `json:"block_type"`
