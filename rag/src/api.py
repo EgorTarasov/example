@@ -1,25 +1,30 @@
-from fastapi import FastAPI, Request, WebSocket, APIRouter, WebSocketDisconnect
 import json
-from pydantic import BaseModel
-from contextlib import asynccontextmanager
-import nodes
-from psycopg_pool import AsyncConnectionPool
-import typing as tp
-import httpx
 import os
+import typing as tp
+from contextlib import asynccontextmanager
 from enum import Enum
-from dotenv import load_dotenv
-import models
-from graph import build_tree, map_nodes, get_nodes
-from build import build_pipeline_from_tree
-from fastapi.responses import HTMLResponse
-from chat import CHAT_HTML
 
+import httpx
+from dotenv import load_dotenv
+from fastapi import APIRouter, FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from psycopg_pool import AsyncConnectionPool
+from pydantic import BaseModel
+
+import models
+import nodes
+from build import build_pipeline_from_tree
+from chat import CHAT_HTML
+from graph import build_tree, get_nodes, map_nodes
 
 load_dotenv(".env")
 # BACKEND_URL = os.getenv("BACKEND_URL")
 # POSTGRES_DSN = os.getenv("POSTGRES_DSN")
 BACKEND_URL = "https://larek.tech"
+
+templates = Jinja2Templates(directory="./templates")
 
 
 class PipelineState:
@@ -52,6 +57,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     lifespan=lifespan,
 )
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 def assemble_pipeline(payload: models.Pipeline) -> nodes.PipeLine | None:
@@ -95,7 +101,7 @@ async def create_pipeline(
             get_nodes(data["nodes"]),
         )
 
-        #     source_url,
+        #
         print(result)
         # )
 
@@ -142,10 +148,36 @@ async def stream_pipeline(
                 query = json.loads(query_data)["query"]
 
                 # Stream response chunks
-                async for chunk in pipeline.stream(query):
-                    await websocket.send_text(
-                        json.dumps({"type": "chunk", "content": chunk})
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "context",
+                            "content": {
+                                "url": "https://s3.larek.tech/t1-dev/test_referat.pdf",
+                                "size": "11",
+                            },
+                        }
                     )
+                )
+                async for chunk in pipeline.stream(query):
+
+                    if chunk["type"] == "answer":
+                        await websocket.send_text(
+                            json.dumps({"type": "chunk", "content": chunk["value"]})
+                        )
+                    if chunk["type"] == "context":
+                        print("context", chunk)
+                        response_metadata = []
+                        for doc in chunk["value"]:
+                            response_metadata.append(doc.metadata)
+                        await websocket.send_text(
+                            json.dumps(
+                                {
+                                    "type": "context",
+                                    "content": response_metadata[0],
+                                }
+                            )
+                        )
 
                 # Send completion message
                 await websocket.send_text(json.dumps({"type": "done"}))
@@ -184,6 +216,22 @@ async def get_chat_page(
             title=data["title"],
             description=data["description"],
         )
+    )
+
+
+@app.get("/chat/{pipeline_id}", response_class=HTMLResponse)
+async def chat_item(request: Request, pipeline_id: int):
+    response = httpx.get(f"{BACKEND_URL}/api/dashboard/pipeline/{pipeline_id}/")
+    data = response.json()
+
+    return templates.TemplateResponse(
+        "chat.html",
+        {
+            "request": request,
+            "title": data["title"],
+            "description": data["description"],
+            "pipeline_id": pipeline_id,
+        },
     )
 
 

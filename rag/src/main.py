@@ -1,12 +1,7 @@
-from nodes import (
-    create_pgvector,
-    PipeLine,
-    PDFParser,
-    create_llm,
-    create_token_splitter,
-)
 import logging
 
+from nodes import (PDFParser, PipeLine, create_llm, create_pgvector,
+                   create_token_splitter)
 
 # Configure logging
 logging.basicConfig(

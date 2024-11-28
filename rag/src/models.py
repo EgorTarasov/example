@@ -1,5 +1,6 @@
+from typing import Any, List, Optional, Union
+
 from pydantic import BaseModel
-from typing import List, Union, Optional, Any
 
 
 class Edge(BaseModel):

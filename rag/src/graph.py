@@ -1,6 +1,6 @@
-from collections import defaultdict
 import json
 import re
+from collections import defaultdict
 
 
 def get_nodes(data):

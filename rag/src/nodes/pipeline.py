@@ -1,14 +1,15 @@
-from .record import Record, to_documents
-from .data_source import DataBlock
-from langchain_core.vectorstores.base import VectorStore
-from langchain_core.language_models.base import BaseLanguageModel
-from langchain_text_splitters.base import TextSplitter
 import logging
-
 import typing as tp
-from langchain_core.prompts import ChatPromptTemplate
+
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.language_models.base import BaseLanguageModel
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.vectorstores.base import VectorStore
+from langchain_text_splitters.base import TextSplitter
+
+from .data_source import DataBlock
+from .record import Record, to_documents
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +68,10 @@ class PipeLine:
 
     async def stream(self, query):
         async for chunk in self.rag_chain.astream({"input": query}):
+            if "context" in chunk:
+                yield {"type": "context", "value": chunk["context"]}
             if "answer" in chunk:
-                yield chunk["answer"]
+                yield {"type": "answer", "value": chunk["answer"]}
 
     # async def stream(self, query: str) -> tp.AsyncGenerator[str, None]:
     #     response_stream = await self.rag_chain.ainvoke(

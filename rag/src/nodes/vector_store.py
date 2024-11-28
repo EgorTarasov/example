@@ -1,10 +1,11 @@
 import typing as tp
-from .record import Record
-from langchain_huggingface import HuggingFaceEmbeddings
+
 from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_postgres import PGVector
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from .record import Record
 
 EMBEDDING_MODELS = ["nomic-ai/nomic-embed-text-v1", "Tochka-AI/ruRoPEBert-e5-base-2k"]
 

@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
-from .record import Record
-import httpx
-import fitz  # PyMuPDF
 import logging
+from abc import ABC, abstractmethod
 
+import fitz  # PyMuPDF
+import httpx
+
+from .record import Record
 
 logger = logging.getLogger(__name__)  # Create a logger for this module
 
