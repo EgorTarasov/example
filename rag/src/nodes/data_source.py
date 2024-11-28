@@ -23,14 +23,18 @@ class PDFParser(DataBlock):
         self.client = httpx.Client(
             follow_redirects=True,
         )
+        self.url = url
 
     def parse(self) -> list[Record]:
+
         logger.info(f"Fetching PDF from URL: {self.url}")
         try:
             response = self.client.get(self.url)
             response.raise_for_status()
         except httpx.HTTPError as e:
             logger.error(f"HTTP error occurred while fetching PDF: {e}")
+            return []
+        except Exception as e:
             return []
 
         logger.info("Opening PDF file")

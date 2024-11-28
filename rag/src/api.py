@@ -10,15 +10,16 @@ import os
 from enum import Enum
 from dotenv import load_dotenv
 import models
-from graph import build_tree, map_nodes
+from graph import build_tree, map_nodes, get_nodes
 from build import build_pipeline_from_tree
 from fastapi.responses import HTMLResponse
 from chat import CHAT_HTML
 
 
 load_dotenv(".env")
-BACKEND_URL = os.getenv("BACKEND_URL")
-POSTGRES_DSN = os.getenv("POSTGRES_DSN")
+# BACKEND_URL = os.getenv("BACKEND_URL")
+# POSTGRES_DSN = os.getenv("POSTGRES_DSN")
+BACKEND_URL = "https://larek.tech"
 
 
 class PipelineState:
@@ -42,10 +43,10 @@ def get_conn_str():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.async_pool = AsyncConnectionPool(conninfo=get_conn_str())
+    # app.async_pool = AsyncConnectionPool(conninfo=get_conn_str())
     app.state.pipelines = pipelines  # Store the pipelines dictionary in app.state
     yield
-    await app.async_pool.close()
+    # await app.async_pool.close()
 
 
 app = FastAPI(
@@ -70,26 +71,12 @@ def assemble_pipeline(payload: models.Pipeline) -> nodes.PipeLine | None:
     return None
 
 
-def get_nodes(data: list[dict]) -> dict:
-    result = {
-        "data_block": {},
-        "input_block": {},
-        "widget_block": {},
-        "llm_block": {},
-        "vector_store": {},
-        "text_splitter": {},
-    }
-    for node in data:
-        result[node["block_type"]][node["id"]] = node
-
-    return result
-
-
 @app.post("/pipeline/")
 async def create_pipeline(
     request: Request,
     pipeline_id: int,
     source_url: str,
+    build: bool = False,
 ):
     try:
         response = httpx.get(f"{BACKEND_URL}/api/dashboard/pipeline/{pipeline_id}/")
@@ -98,19 +85,25 @@ async def create_pipeline(
         if response.status_code != 200:
             return {"message": "Pipeline not found"}
         data = response.json()
-        models.Pipeline.parse_raw(response.content)
 
-        tree = build_tree(data["edges"])
-        nodes = get_nodes(data["nodes"])
-
-        result_pipeline = build_pipeline_from_tree(
-            map_nodes(tree, nodes),
-            source_url,
+        json_pipeline = models.Pipeline.parse_raw(response.content)
+        print(json_pipeline)
+        print(data["nodes"])
+        # result_pipeline = build_pipeline_from_tree(
+        result = map_nodes(
+            build_tree(data["edges"]),
+            get_nodes(data["nodes"]),
         )
-        result_pipeline.build()
 
+        #     source_url,
+        print(result)
+        # )
+
+        result_pipeline = build_pipeline_from_tree(result, source_url)
         request.app.state.pipelines[pipeline_id] = result_pipeline
 
+        if build:
+            await result_pipeline.build()
         return
     except Exception as e:
         print(e)
@@ -192,3 +185,9 @@ async def get_chat_page(
             description=data["description"],
         )
     )
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

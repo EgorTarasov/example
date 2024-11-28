@@ -29,7 +29,7 @@ class PipeLine:
         self.splitter = splitter
         self.store = store
         self.model = model
-
+        self.system_prompt = system_prompt
         self.retriever = self.store.as_retriever()
 
         self.prompt = ChatPromptTemplate.from_messages(
